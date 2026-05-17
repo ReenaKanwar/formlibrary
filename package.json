@@ -1,0 +1,27 @@
+{
+  "name": "formLibrary",
+  "version": "1.0.0",
+  "main": "dist/formLibrary.umd.js",
+  "module": "dist/formLibrary.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/formLibrary.es.js",
+      "require": "./dist/formLibrary.umd.js"
+    },
+    "./dist/style.css": "./dist/style.css"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  }
+}
