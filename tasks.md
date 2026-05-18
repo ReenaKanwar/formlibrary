@@ -262,7 +262,7 @@ Run the Vite build to compile the library and verify the output artifacts are co
 ### Task 8 — Scaffold the Test App (`my-ui-test-app`)
 
 **Status:** `[x] Done`
-**Assignee:** Rajiv
+**Assignee:** reena
 
 **Depends On:** Task 7
 
@@ -293,7 +293,7 @@ Create a minimal Vite + React consumer application at `Lib/my-ui-test-app/`. Thi
 ### Task 9 — Integrate the Library into the Test App (`App.jsx`)
 
 **Status:** `[x] Done`
-**Assignee:** Rajiv
+**Assignee:** reena
 
 **Depends On:** Task 8
 
