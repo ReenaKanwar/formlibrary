@@ -10,14 +10,18 @@
 
 ```
 Lib/
-├── formLibrary/          ← The component library (Phase 1)
+├── formLibrary/          ← The component library (Phase 1 & 2)
 │   ├── src/
 │   │   ├── index.js                  ← Barrel export (exports all components)
 │   │   └── components/
-│   │       └── Button/
-│   │           ├── Button.js         ← Functional React component
-│   │           ├── Button.css        ← Scoped styles
-│   │           └── index.js          ← Re-exports Button
+│   │       ├── Button/
+│   │       │   ├── Button.js         ← Functional React component
+│   │       │   ├── Button.css        ← Scoped styles
+│   │       │   └── index.js          ← Re-exports Button
+│   │       └── Form/                 ← [NEW] Reusable dynamic Form component
+│   │           ├── Form.js           ← Functional React component
+│   │           ├── Form.css          ← Scoped styles
+│   │           └── index.js          ← Re-exports Form
 │   ├── dist/                         ← Auto-generated on build (DO NOT edit manually)
 │   ├── vite.config.js                ← Vite library mode config
 │   ├── package.json
@@ -25,7 +29,7 @@ Lib/
 │
 └── my-ui-test-app/         ← Vite + React consumer app (Phase 2)
     ├── src/
-    │   └── App.jsx                   ← Imports & renders Button from the library
+    │   └── App.jsx                   ← Imports & renders components from the library
     └── package.json
 ```
 
@@ -382,6 +386,242 @@ Write a complete `README.md` inside `formLibrary/` so any developer (or their AI
 
 ---
 
+### Task 11 — Create Reusable `Form` Component Structure
+
+**Status:** `[ ] To Do`
+**Assignee:** Rajiv
+
+**Depends On:** Task 3 (Barrel src/index.js)
+
+**Description:**
+Create the folder and file scaffolding for the new `Form` component inside the library. The `Form` component accepts a `data` prop (an array of field config objects) and dynamically renders the appropriate form fields based on each item's `type`.
+
+**Steps:**
+1. Create the folder: `formLibrary/src/components/Form/`.
+2. Create three files inside it:
+   - `Form.js` — the main functional component (see Task 12 for implementation).
+   - `Form.css` — scoped styles (see Task 13).
+   - `index.js` — barrel re-export.
+3. In `index.js`, add:
+   ```js
+   export { Form } from './Form';
+   ```
+
+**Output Criteria:**
+- `src/components/Form/` folder exists with all 3 files.
+- `Form/index.js` re-exports `Form` as a named export.
+
+---
+
+### Task 12 — Implement Dynamic Field Rendering in `Form.js`
+
+**Status:** `[ ] To Do`
+**Assignee:** Rajiv
+
+**Depends On:** Task 11
+
+**Description:**
+Implement the `Form` component logic. It receives a `data` prop — an array of field config objects — and renders a form field for each entry based on its `type`. Supported types: `text`, `email`, `password`, `radio`.
+
+**Accepted `data` Prop Shape:**
+```js
+const formData = [
+  { label: "Full Name",  type: "text",     required: true },
+  { label: "Email",      type: "email",    required: true },
+  { label: "Password",   type: "password", required: true },
+  { label: "Gender",     type: "radio",    options: ["Male", "Female"], required: true },
+];
+```
+
+**Usage Example:**
+```jsx
+import { Form } from 'formLibrary';
+
+const formData = [
+  { label: "Full Name", type: "text", required: true },
+];
+
+<Form data={formData} />
+```
+
+**Steps:**
+1. Open `Form.js` and write the component as a **named export**:
+   ```js
+   import './Form.css';
+
+   export function Form({ data = [] }) {
+     return (
+       <form className="form-wrapper">
+         {data.map((field, index) => (
+           <div key={index} className="form-field">
+             <label className="form-label">
+               {field.label}{field.required && <span className="required"> *</span>}
+             </label>
+
+             {field.type === 'radio' ? (
+               <div className="radio-group">
+                 {field.options.map((option, i) => (
+                   <label key={i} className="radio-option">
+                     <input
+                       type="radio"
+                       name={field.label}
+                       value={option}
+                       required={field.required}
+                     />
+                     {option}
+                   </label>
+                 ))}
+               </div>
+             ) : (
+               <input
+                 className="form-input"
+                 type={field.type}
+                 placeholder={field.label}
+                 required={field.required}
+               />
+             )}
+           </div>
+         ))}
+       </form>
+     );
+   }
+   ```
+2. Verify each `type` (`text`, `email`, `password`) renders an `<input>` tag.
+3. Verify `type: 'radio'` renders all `options` as individual radio inputs grouped by `name`.
+4. Verify `required: true` sets the HTML `required` attribute on inputs.
+
+**Output Criteria:**
+- `Form.js` exists with a named export `Form`.
+- Text / email / password types render a single `<input>`.
+- Radio type renders one `<input type="radio">` per option.
+- `required` attribute is correctly applied.
+- Uses `.js` extension only (no `.jsx`).
+
+---
+
+### Task 13 — Add CSS Styling for Column Layout (`Form.css`)
+
+**Status:** `[ ] To Do`
+**Assignee:** Rajiv
+
+**Depends On:** Task 11
+
+**Description:**
+Create the CSS file for the `Form` component. Fields must render **vertically (column-wise)**. Styling must be scoped using specific class names to avoid conflicts with the rest of the library.
+
+**Steps:**
+1. Open `formLibrary/src/components/Form/Form.css`.
+2. Implement the following CSS rules:
+
+   **`.form-wrapper`** — the outer `<form>` container:
+   - `display: flex`
+   - `flex-direction: column`
+   - `gap: 16px`
+   - `max-width: 400px`
+   - `width: 100%`
+
+   **`.form-field`** — wrapper around each label + input pair:
+   - `display: flex`
+   - `flex-direction: column`
+   - `gap: 6px`
+
+   **`.form-label`** — the field label text:
+   - `font-size: 14px`
+   - `font-weight: 600`
+   - `color: #374151`
+
+   **`.required`** — the asterisk for required fields:
+   - `color: #ef4444`
+
+   **`.form-input`** — text / email / password inputs:
+   - `padding: 10px 12px`
+   - `border: 1.5px solid #d1d5db`
+   - `border-radius: 6px`
+   - `font-size: 14px`
+   - `outline: none`
+   - `transition: border-color 0.2s ease`
+
+   **`.form-input:focus`:**
+   - `border-color: #4f46e5`
+
+   **`.radio-group`** — container for radio options:
+   - `display: flex`
+   - `gap: 16px`
+   - `flex-wrap: wrap`
+
+   **`.radio-option`** — individual radio label:
+   - `display: flex`
+   - `align-items: center`
+   - `gap: 6px`
+   - `font-size: 14px`
+   - `cursor: pointer`
+
+**Output Criteria:**
+- `Form.css` exists with all 8 rule blocks.
+- Fields display vertically (column layout) with consistent spacing.
+- Required asterisk displays in red (`#ef4444`).
+- Inputs show a focus highlight matching the library's brand color (`#4f46e5`).
+
+---
+
+### Task 14 — Export `Form` from `src/index.js` and Test Locally
+
+**Status:** `[ ] To Do`
+**Assignee:** Rajiv
+
+**Depends On:** Tasks 12, 13
+
+**Description:**
+Register the `Form` component in the library's barrel file so it is publicly available to consumers. Then rebuild the library and verify the component renders correctly in the existing `my-ui-test-app`.
+
+**Export Requirement:**
+- `Form` must be exported from `src/index.js` so consumers can import it as:
+  ```js
+  import { Form } from 'formLibrary';
+  ```
+
+**Steps:**
+1. Open `formLibrary/src/index.js` and add the Form export:
+   ```js
+   export { Button } from './components/Button';
+   export { Form }   from './components/Form';   // ← Add this line
+   ```
+2. Run `npm run build` inside `formLibrary/` to rebuild the `dist/` output.
+3. Re-link the library in `my-ui-test-app/` (run `npm install` inside the test app).
+4. Open `my-ui-test-app/src/App.jsx` and add a test render:
+   ```jsx
+   import { Button, Form } from 'formLibrary';
+   import 'formLibrary/dist/style.css';
+
+   const formData = [
+     { label: 'Full Name',  type: 'text',     required: true },
+     { label: 'Email',      type: 'email',    required: true },
+     { label: 'Password',   type: 'password', required: true },
+     { label: 'Gender',     type: 'radio',    options: ['Male', 'Female'], required: true },
+   ];
+
+   function App() {
+     return (
+       <div style={{ padding: '40px' }}>
+         <Form data={formData} />
+       </div>
+     );
+   }
+
+   export default App;
+   ```
+5. Run `npm run dev` inside `my-ui-test-app/` and open the browser.
+
+**Output Criteria:**
+- `src/index.js` exports both `Button` and `Form`.
+- `npm run build` completes with no errors.
+- All 4 fields (Full Name, Email, Password, Gender) render vertically in the browser.
+- Radio options (Male, Female) are both visible and clickable.
+- Required asterisks are visible next to all labels.
+- No console errors.
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -395,6 +635,11 @@ Task 1 (Init Library)
                       └── Task 8 (Scaffold Test App)
                            └── Task 9 (Integrate in Test App)
                                 └── Task 10 (Write README)
+
+Task 11 (Form Component Structure)     ← Phase 2 start
+  └── Task 12 (Dynamic Field Rendering)
+       └── Task 13 (Form CSS — Column Layout)
+            └── Task 14 (Export & Local Test Form)
 ```
 
 ---
@@ -414,4 +659,4 @@ Task 1 (Init Library)
 
 ---
 
-*Last updated: 2026-05-17 | Conversation ID: c9136ce0-d477-4af1-b120-388293b26c74*
+*Last updated: 2026-05-18 | Conversation ID: 38049064-9c49-4e4a-83bf-725381ec9a09*
