@@ -116,8 +116,8 @@ Create the library's central export file at `formLibrary/src/index.js`. This fil
 
 ### Task 4 — Build the `Button` Component (`Button.js`)
 
-**Status:** `[ ] Pending`
-**Assignee:** ___________
+**Status:** `[x] Done`
+**Assignee:** Rajiv
 
 **Depends On:** Task 3
 
@@ -164,8 +164,8 @@ export function Button({ label, onClick, variant = 'primary', className = '', st
 
 ### Task 5 — Style the `Button` Component (`Button.css`)
 
-**Status:** `[ ] Pending`
-**Assignee:** ___________
+**Status:** `[x] Done`
+**Assignee:** Rajiv
 
 **Depends On:** Task 4
 
@@ -174,7 +174,7 @@ Create the CSS file for the `Button` component at `formLibrary/src/components/Bu
 
 **Steps:**
 1. Create `Button.css` inside `formLibrary/src/components/Button/`.
-2. Import it at the top of `Button.js`: `import './Button.css';`
+2. Import it at the top of `Button.jsx`: `import './Button.css';`
 3. Implement the following CSS rules:
 
    **Base class `.btn`:**
@@ -204,14 +204,14 @@ Create the CSS file for the `Button` component at `formLibrary/src/components/Bu
 
 **Output Criteria:**
 - `Button.css` exists with all 5 rule blocks (base, primary, primary:hover, secondary, secondary:hover).
-- `Button.js` imports `Button.css`.
+- `Button.jsx` imports `Button.css`.
 
 ---
 
 ### Task 6 — Create the Button Barrel (`components/Button/index.js`)
 
-**Status:** `[ ] Pending`
-**Assignee:** ___________
+**Status:** `[x] Done`
+**Assignee:** Rajiv
 
 **Depends On:** Task 4
 
@@ -233,8 +233,8 @@ Create the `index.js` inside the `Button/` folder so that other files (like `src
 
 ### Task 7 — Build the Library and Verify `dist/` Output
 
-**Status:** `[ ] Pending`
-**Assignee:** ___________
+**Status:** `[x] Done`
+**Assignee:** Rajiv
 
 **Depends On:** Tasks 2, 3, 4, 5, 6
 
@@ -261,8 +261,8 @@ Run the Vite build to compile the library and verify the output artifacts are co
 
 ### Task 8 — Scaffold the Test App (`my-ui-test-app`)
 
-**Status:** `[ ] Pending`
-**Assignee:** ___________
+**Status:** `[x] Done`
+**Assignee:** Rajiv
 
 **Depends On:** Task 7
 
@@ -292,8 +292,8 @@ Create a minimal Vite + React consumer application at `Lib/my-ui-test-app/`. Thi
 
 ### Task 9 — Integrate the Library into the Test App (`App.jsx`)
 
-**Status:** `[ ] Pending`
-**Assignee:** ___________
+**Status:** `[x] Done`
+**Assignee:** Rajiv
 
 **Depends On:** Task 8
 
@@ -340,8 +340,8 @@ Update `my-ui-test-app/src/App.jsx` to import and render both button variants fr
 
 ### Task 10 — Write the Library `README.md`
 
-**Status:** `[ ] Pending`
-**Assignee:** ___________
+**Status:** `[x] Done`
+**Assignee:** Rajiv
 
 **Depends On:** Tasks 7, 9
 
