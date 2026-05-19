@@ -388,8 +388,8 @@ Write a complete `README.md` inside `formLibrary/` so any developer (or their AI
 
 ### Task 11 — Create Reusable `Form` Component Structure
 
-**Status:** `[ ] To Do`
-**Assignee:** Rajiv
+**Status:** `[x] Done`
+**Assignee:** reena
 
 **Depends On:** Task 3 (Barrel src/index.js)
 
@@ -415,8 +415,8 @@ Create the folder and file scaffolding for the new `Form` component inside the l
 
 ### Task 12 — Implement Dynamic Field Rendering in `Form.js`
 
-**Status:** `[ ] To Do`
-**Assignee:** Rajiv
+**Status:** `[x] Done`
+**Assignee:** reena
 
 **Depends On:** Task 11
 
@@ -501,8 +501,8 @@ const formData = [
 
 ### Task 13 — Add CSS Styling for Column Layout (`Form.css`)
 
-**Status:** `[ ] To Do`
-**Assignee:** Rajiv
+**Status:** `[x] Done`
+**Assignee:** reena
 
 **Depends On:** Task 11
 
@@ -566,8 +566,8 @@ Create the CSS file for the `Form` component. Fields must render **vertically (c
 
 ### Task 14 — Export `Form` from `src/index.js` and Test Locally
 
-**Status:** `[ ] To Do`
-**Assignee:** Rajiv
+**Status:** `[x] Done`
+**Assignee:** reena
 
 **Depends On:** Tasks 12, 13
 
