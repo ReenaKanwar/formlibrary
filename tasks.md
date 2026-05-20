@@ -622,6 +622,618 @@ Register the `Form` component in the library's barrel file so it is publicly ava
 
 ---
 
+## 🏗️ Phase 3 — Reusable Field Component Architecture
+
+> **Architecture Decision:** `Form.js` is refactored to remain clean and scalable. Every field type becomes its own isolated, reusable component. Dynamic rendering is handled through a `fieldMapper` utility.
+
+---
+
+### 🗂️ Updated Folder Structure (Phase 3)
+
+```
+src/
+├── components/
+│
+│   ├── Form/
+│   │   ├── Form.js
+│   │   ├── Form.css
+│   │   └── index.js
+│
+│   ├── fields/
+│   │   ├── BaseField/
+│   │   │   ├── BaseField.js
+│   │   │   ├── BaseField.css
+│   │   │   └── index.js
+│   │   │
+│   │   ├── TextField/
+│   │   ├── EmailField/
+│   │   ├── PasswordField/
+│   │   ├── CheckboxField/
+│   │   ├── RadioField/
+│   │   ├── SelectField/
+│   │   ├── TextAreaField/
+│   │   ├── FileField/
+│   │   ├── DateField/
+│   │   └── NumberField/
+│
+├── utils/
+│   └── fieldMapper.js
+```
+
+---
+
+### 📐 Architecture Principles
+
+| Principle | Rule |
+|-----------|------|
+| **Isolated field components** | Every field type must be its own self-contained, reusable component |
+| **Clean Form.js** | `Form.js` only loops through data, maps types, and renders field components — no inline field logic |
+| **Dynamic rendering** | Field resolution must use a `fieldMapper` object keyed by field `type` string |
+| **Shared UI logic** | Common layout (label, required asterisk, wrapper) must live in `BaseField` and be reused by all field components |
+| **Simple CSS** | All styling uses plain Vanilla CSS — no CSS Modules, no Tailwind |
+| **JS only** | All files use `.js` extension — no `.jsx` |
+| **React functional components** | All components are written as React functional components with named exports |
+
+---
+
+### 🎨 UI Requirements
+
+| Requirement | Detail |
+|-------------|--------|
+| **Layout** | All form fields render column-wise (top to bottom, stacked vertically) |
+| **Label alignment** | Labels must be left-aligned above their input |
+| **Field spacing** | Consistent spacing between each field using `gap` in CSS flexbox |
+| **Input width** | Inputs take the full available width of the form container |
+| **Required indicator** | Required fields display a red `*` asterisk via the `required` prop |
+| **Clean layout** | Form layout must remain clean, minimal, and reusable across any consumer app |
+
+---
+
+### 📦 Dynamic Form Data Shape
+
+`Form.js` must accept a `data` prop — an array of field configuration objects. Each object describes one field:
+
+```js
+const formData = [
+  {
+    label: "Full Name",
+    type: "text",
+    required: true,
+  },
+  {
+    label: "Email",
+    type: "email",
+    required: true,
+  },
+  {
+    label: "Gender",
+    type: "radio",
+    options: ["Male", "Female"],
+  },
+];
+```
+
+> **Supported `type` values:** `text`, `email`, `password`, `checkbox`, `radio`, `select`, `textarea`, `file`, `date`, `number`
+
+---
+
+### 📥 Final Import Requirement
+
+The library must support the following clean import syntax in any consumer application:
+
+```js
+import { Form } from "my-ui-library";
+```
+
+No additional setup or internal path imports should be required from the consumer.
+
+---
+
+### Task 15 — Create Reusable Fields Folder Structure
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 11 (Form Component Structure)
+
+**Description:**
+Set up the complete `fields/` folder structure inside `src/components/`. This scaffold will house all individual field components. Creating this structure first ensures every team member works within the same organized layout before writing any component logic.
+
+**Steps:**
+1. Inside `formLibrary/src/components/`, create a new folder named `fields/`.
+2. Inside `fields/`, create one subfolder for each field type:
+   - `BaseField/`
+   - `TextField/`
+   - `EmailField/`
+   - `PasswordField/`
+   - `CheckboxField/`
+   - `RadioField/`
+   - `SelectField/`
+   - `TextAreaField/`
+   - `FileField/`
+   - `DateField/`
+   - `NumberField/`
+3. Inside each subfolder, create three placeholder files:
+   - `[FieldName].js` — component file (leave empty for now)
+   - `[FieldName].css` — styles file (leave empty for now)
+   - `index.js` — barrel re-export (leave empty for now)
+4. Also create the `utils/` folder at `formLibrary/src/utils/` and add an empty `fieldMapper.js` file.
+
+**Output Criteria:**
+- `src/components/fields/` exists with all 11 subfolders.
+- Each subfolder contains 3 placeholder files (`.js`, `.css`, `index.js`).
+- `src/utils/fieldMapper.js` exists.
+
+---
+
+### Task 16 — Create `BaseField` Wrapper Component
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 15
+
+**Description:**
+Build the `BaseField` component — a shared wrapper that every field component uses for consistent layout. It renders the label, the required asterisk, and a slot for the actual input. This eliminates repeated label/wrapper code across all 10 field components and keeps the UI consistent.
+
+**Steps:**
+1. Open `formLibrary/src/components/fields/BaseField/BaseField.js`.
+2. Implement as a named export React functional component:
+   ```js
+   import './BaseField.css';
+
+   export function BaseField({ label, required, children }) {
+     return (
+       <div className="base-field">
+         <label className="base-field__label">
+           {label}
+           {required && <span className="base-field__required"> *</span>}
+         </label>
+         {children}
+       </div>
+     );
+   }
+   ```
+3. Open `BaseField.css` and add:
+   - `.base-field` — `display: flex`, `flex-direction: column`, `gap: 6px`, `width: 100%`
+   - `.base-field__label` — `font-size: 14px`, `font-weight: 600`, `color: #374151`, `text-align: left`
+   - `.base-field__required` — `color: #ef4444`, `margin-left: 2px`
+4. Open `index.js` and add:
+   ```js
+   export { BaseField } from './BaseField';
+   ```
+
+**Output Criteria:**
+- `BaseField.js` is a named export functional component accepting `label`, `required`, and `children` props.
+- `BaseField.css` contains all 3 rule blocks.
+- Label is left-aligned and required asterisk renders in red.
+- `index.js` re-exports `BaseField`.
+
+---
+
+### Task 17 — Create `TextField` Component
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 16
+
+**Description:**
+Build the `TextField` component for `type: "text"` fields. It wraps `BaseField` for layout and renders a standard text input. This is the simplest and most common field type — a good first component to implement after `BaseField`.
+
+**Steps:**
+1. Open `formLibrary/src/components/fields/TextField/TextField.js`.
+2. Implement as a named export:
+   ```js
+   import './TextField.css';
+   import { BaseField } from '../BaseField';
+
+   export function TextField({ label, required, value, onChange, placeholder }) {
+     return (
+       <BaseField label={label} required={required}>
+         <input
+           className="text-field__input"
+           type="text"
+           value={value}
+           onChange={onChange}
+           placeholder={placeholder || label}
+           required={required}
+         />
+       </BaseField>
+     );
+   }
+   ```
+3. In `TextField.css`, style `.text-field__input`:
+   - `padding: 10px 12px`
+   - `border: 1.5px solid #d1d5db`
+   - `border-radius: 6px`
+   - `font-size: 14px`
+   - `width: 100%`
+   - `box-sizing: border-box`
+   - `outline: none`
+   - `transition: border-color 0.2s ease`
+   - On `:focus` — `border-color: #4f46e5`
+4. Add `export { TextField } from './TextField';` to `index.js`.
+
+**Output Criteria:**
+- `TextField` renders inside `BaseField` with label and required asterisk.
+- Input takes full width and shows a focus ring on interaction.
+- `index.js` re-exports the component.
+
+---
+
+### Task 18 — Create `EmailField` Component
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 16
+
+**Description:**
+Build the `EmailField` component for `type: "email"` fields. It is structurally identical to `TextField` but uses `type="email"` on the input element, which enables browser-native email format validation.
+
+**Steps:**
+1. Open `EmailField/EmailField.js` and implement as a named export:
+   ```js
+   import './EmailField.css';
+   import { BaseField } from '../BaseField';
+
+   export function EmailField({ label, required, value, onChange }) {
+     return (
+       <BaseField label={label} required={required}>
+         <input
+           className="email-field__input"
+           type="email"
+           value={value}
+           onChange={onChange}
+           placeholder={label}
+           required={required}
+         />
+       </BaseField>
+     );
+   }
+   ```
+2. In `EmailField.css`, copy the same input styles as `TextField.css` using the class `.email-field__input`.
+3. Add `export { EmailField } from './EmailField';` to `index.js`.
+
+**Output Criteria:**
+- Input uses `type="email"` for browser-native validation.
+- Component wraps `BaseField` for consistent label layout.
+- `index.js` re-exports `EmailField`.
+
+---
+
+### Task 19 — Create `PasswordField` Component
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 16
+
+**Description:**
+Build the `PasswordField` component for `type: "password"` fields. It uses `type="password"` on the input to automatically mask the entered text. The component follows the same structure as `TextField` and `EmailField`.
+
+**Steps:**
+1. Open `PasswordField/PasswordField.js` and implement as a named export:
+   ```js
+   import './PasswordField.css';
+   import { BaseField } from '../BaseField';
+
+   export function PasswordField({ label, required, value, onChange }) {
+     return (
+       <BaseField label={label} required={required}>
+         <input
+           className="password-field__input"
+           type="password"
+           value={value}
+           onChange={onChange}
+           placeholder={label}
+           required={required}
+         />
+       </BaseField>
+     );
+   }
+   ```
+2. In `PasswordField.css`, apply the same input styles using the class `.password-field__input`.
+3. Add `export { PasswordField } from './PasswordField';` to `index.js`.
+
+**Output Criteria:**
+- Input uses `type="password"` and masks characters.
+- Layout is consistent with `TextField` and `EmailField`.
+- `index.js` re-exports `PasswordField`.
+
+---
+
+### Task 20 — Create `CheckboxField` Component
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 16
+
+**Description:**
+Build the `CheckboxField` component for `type: "checkbox"` fields. Unlike text-based fields, this component renders a checkbox input alongside the label in a horizontal inline layout.
+
+**Steps:**
+1. Open `CheckboxField/CheckboxField.js` and implement as a named export:
+   ```js
+   import './CheckboxField.css';
+
+   export function CheckboxField({ label, required, checked, onChange }) {
+     return (
+       <div className="checkbox-field">
+         <input
+           className="checkbox-field__input"
+           type="checkbox"
+           checked={checked}
+           onChange={onChange}
+           required={required}
+           id={label}
+         />
+         <label className="checkbox-field__label" htmlFor={label}>
+           {label}
+           {required && <span className="checkbox-field__required"> *</span>}
+         </label>
+       </div>
+     );
+   }
+   ```
+   > Note: `CheckboxField` does not use `BaseField` because its label renders beside the checkbox, not above it.
+2. In `CheckboxField.css`, style:
+   - `.checkbox-field` — `display: flex`, `align-items: center`, `gap: 8px`
+   - `.checkbox-field__label` — `font-size: 14px`, `color: #374151`, `cursor: pointer`
+   - `.checkbox-field__required` — `color: #ef4444`
+3. Add `export { CheckboxField } from './CheckboxField';` to `index.js`.
+
+**Output Criteria:**
+- Checkbox and label appear on the same horizontal line.
+- Clicking the label toggles the checkbox (via `htmlFor` + `id`).
+- `index.js` re-exports `CheckboxField`.
+
+---
+
+### Task 21 — Create `RadioField` Component
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 16
+
+**Description:**
+Extract the radio input logic from the existing `Form.js` (Task 12) into a dedicated, reusable `RadioField` component. The component accepts an `options` array and renders one radio button per option, all grouped under the same `name`.
+
+**Steps:**
+1. Open `RadioField/RadioField.js` and implement as a named export:
+   ```js
+   import './RadioField.css';
+   import { BaseField } from '../BaseField';
+
+   export function RadioField({ label, required, options = [], value, onChange }) {
+     return (
+       <BaseField label={label} required={required}>
+         <div className="radio-field__group">
+           {options.map((option, i) => (
+             <label key={i} className="radio-field__option">
+               <input
+                 type="radio"
+                 name={label}
+                 value={option}
+                 checked={value === option}
+                 onChange={onChange}
+                 required={required}
+               />
+               {option}
+             </label>
+           ))}
+         </div>
+       </BaseField>
+     );
+   }
+   ```
+2. In `RadioField.css`, style:
+   - `.radio-field__group` — `display: flex`, `gap: 16px`, `flex-wrap: wrap`
+   - `.radio-field__option` — `display: flex`, `align-items: center`, `gap: 6px`, `font-size: 14px`, `cursor: pointer`
+3. Add `export { RadioField } from './RadioField';` to `index.js`.
+
+**Output Criteria:**
+- All radio options render inside `BaseField` with the shared label.
+- Options are grouped by `name` so only one can be selected at a time.
+- `index.js` re-exports `RadioField`.
+
+---
+
+### Task 22 — Create `fieldMapper` Utility
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Tasks 17, 18, 19, 20, 21
+
+**Description:**
+Create the `fieldMapper` utility at `src/utils/fieldMapper.js`. This is a plain JavaScript object that maps each field `type` string to its corresponding component. `Form.js` imports this object to dynamically resolve which component to render — keeping `Form.js` clean with zero `if/else` or `switch` statements.
+
+**Steps:**
+1. Open `formLibrary/src/utils/fieldMapper.js`.
+2. Implement the mapper object as a named export:
+   ```js
+   import { TextField }    from '../components/fields/TextField';
+   import { EmailField }   from '../components/fields/EmailField';
+   import { PasswordField } from '../components/fields/PasswordField';
+   import { CheckboxField } from '../components/fields/CheckboxField';
+   import { RadioField }   from '../components/fields/RadioField';
+   import { SelectField }  from '../components/fields/SelectField';
+   import { TextAreaField } from '../components/fields/TextAreaField';
+   import { FileField }    from '../components/fields/FileField';
+   import { DateField }    from '../components/fields/DateField';
+   import { NumberField }  from '../components/fields/NumberField';
+
+   export const fieldMapper = {
+     text:     TextField,
+     email:    EmailField,
+     password: PasswordField,
+     checkbox: CheckboxField,
+     radio:    RadioField,
+     select:   SelectField,
+     textarea: TextAreaField,
+     file:     FileField,
+     date:     DateField,
+     number:   NumberField,
+   };
+   ```
+3. To add a new field type in the future, simply import the new component and add one line to this object — no other file needs to change.
+
+**Output Criteria:**
+- `fieldMapper` is a named export object with 10 keys.
+- Each key maps to the correct field component.
+- Adding a new field type requires changes only to this file.
+
+---
+
+### Task 23 — Update `Form.js` to Dynamically Render Fields via `fieldMapper`
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 22
+
+**Description:**
+Refactor `Form.js` to use the `fieldMapper` utility for dynamic field rendering. The updated `Form.js` should contain **no field-specific logic** — it only loops through the `data` array, resolves the correct component from `fieldMapper`, and renders it. This keeps `Form.js` permanently clean regardless of how many field types are added in the future.
+
+**Steps:**
+1. Open `formLibrary/src/components/Form/Form.js` and replace its implementation:
+   ```js
+   import './Form.css';
+   import { fieldMapper } from '../../utils/fieldMapper';
+
+   export function Form({ data = [], onSubmit }) {
+     const handleSubmit = (e) => {
+       e.preventDefault();
+       if (onSubmit) onSubmit(e);
+     };
+
+     return (
+       <form className="form-wrapper" onSubmit={handleSubmit}>
+         {data.map((field, index) => {
+           const FieldComponent = fieldMapper[field.type];
+
+           if (!FieldComponent) {
+             console.warn(`Form: unknown field type "${field.type}"`);
+             return null;
+           }
+
+           return (
+             <FieldComponent
+               key={index}
+               label={field.label}
+               required={field.required}
+               options={field.options}
+             />
+           );
+         })}
+
+         <button type="submit" className="form-submit-btn">Submit</button>
+       </form>
+     );
+   }
+   ```
+2. Update `Form.css` to add a rule for `.form-submit-btn`:
+   - `margin-top: 8px`
+   - `padding: 10px 24px`
+   - `background-color: #4f46e5`
+   - `color: #ffffff`
+   - `border: none`
+   - `border-radius: 6px`
+   - `font-size: 14px`
+   - `font-weight: 600`
+   - `cursor: pointer`
+   - On `:hover` — `background-color: #4338ca`
+
+**Architecture Rules (must follow):**
+- `Form.js` must NOT contain any `if/else` or `switch` for field types.
+- `Form.js` must NOT import individual field components directly.
+- All field type resolution must go through `fieldMapper`.
+
+**Output Criteria:**
+- `Form.js` uses `fieldMapper` for all field rendering.
+- Unknown `type` values log a warning and skip gracefully.
+- A submit button renders at the bottom of the form.
+- `Form.js` remains clean and scalable — adding new field types requires zero changes to this file.
+
+---
+
+### Task 24 — Export All Field Components and Test the Full Form System Locally
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Tasks 15–23
+
+**Description:**
+Wire up all exports, rebuild the library, and run a full end-to-end verification in `my-ui-test-app`. This is the final integration task for Phase 3 — every field type should render correctly with proper labels, spacing, and required indicators.
+
+**Steps:**
+1. Open `formLibrary/src/index.js` and ensure all exports are present:
+   ```js
+   export { Button }      from './components/Button';
+   export { Form }        from './components/Form';
+   export { TextField }   from './components/fields/TextField';
+   export { EmailField }  from './components/fields/EmailField';
+   export { PasswordField } from './components/fields/PasswordField';
+   export { CheckboxField } from './components/fields/CheckboxField';
+   export { RadioField }  from './components/fields/RadioField';
+   export { SelectField } from './components/fields/SelectField';
+   export { TextAreaField } from './components/fields/TextAreaField';
+   export { FileField }   from './components/fields/FileField';
+   export { DateField }   from './components/fields/DateField';
+   export { NumberField } from './components/fields/NumberField';
+   ```
+2. Run `npm run build` inside `formLibrary/` to rebuild `dist/`.
+3. Run `npm install` inside `my-ui-test-app/` to re-link the updated library.
+4. Open `my-ui-test-app/src/App.jsx` and add a test render covering all field types:
+   ```js
+   import { Form } from 'formLibrary';
+   import 'formLibrary/dist/style.css';
+
+   const formData = [
+     { label: "Full Name",   type: "text",     required: true },
+     { label: "Email",       type: "email",    required: true },
+     { label: "Password",    type: "password", required: true },
+     { label: "Age",         type: "number",   required: false },
+     { label: "Birth Date",  type: "date",     required: false },
+     { label: "Gender",      type: "radio",    options: ["Male", "Female"], required: true },
+     { label: "Subscribe",   type: "checkbox", required: false },
+     { label: "Country",     type: "select",   options: ["India", "USA", "UK"], required: false },
+     { label: "Bio",         type: "textarea", required: false },
+     { label: "Resume",      type: "file",     required: false },
+   ];
+
+   function App() {
+     return (
+       <div style={{ padding: '40px' }}>
+         <Form data={formData} onSubmit={() => alert('Form submitted!')} />
+       </div>
+     );
+   }
+
+   export default App;
+   ```
+5. Run `npm run dev` inside `my-ui-test-app/` and open the browser at the reported local URL.
+6. Visually verify:
+   - All 10 fields render vertically in column layout.
+   - Labels are left-aligned above each input.
+   - Required asterisks are visible in red next to required fields.
+   - Inputs take the full width of the form container.
+   - Submit button renders at the bottom and fires the `onSubmit` callback.
+   - No console errors or warnings.
+
+**Output Criteria:**
+- All 10 field types render correctly in the browser.
+- `npm run build` completes with no errors.
+- The library supports `import { Form } from "formLibrary"` as the only consumer import.
+- Form layout is clean, column-wise, and production-ready.
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -640,6 +1252,17 @@ Task 11 (Form Component Structure)     ← Phase 2 start
   └── Task 12 (Dynamic Field Rendering)
        └── Task 13 (Form CSS — Column Layout)
             └── Task 14 (Export & Local Test Form)
+
+Task 15 (Fields Folder Structure)      ← Phase 3 start
+  └── Task 16 (BaseField Wrapper)
+       ├── Task 17 (TextField)
+       ├── Task 18 (EmailField)
+       ├── Task 19 (PasswordField)
+       ├── Task 20 (CheckboxField)
+       └── Task 21 (RadioField)
+            └── Task 22 (fieldMapper Utility)
+                 └── Task 23 (Refactor Form.js)
+                      └── Task 24 (Export All & Full Local Test)
 ```
 
 ---
@@ -659,4 +1282,4 @@ Task 11 (Form Component Structure)     ← Phase 2 start
 
 ---
 
-*Last updated: 2026-05-18 | Conversation ID: 38049064-9c49-4e4a-83bf-725381ec9a09*
+*Last updated: 2026-05-20 | Conversation ID: a0e0a5aa-63e9-4289-8e77-9f03e68ba01d*

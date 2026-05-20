@@ -1,0 +1,16 @@
+.checkbox-field__container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.checkbox-field__input {
+  width: auto;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.checkbox-field__required {
+  color: #dc2626;
+}
