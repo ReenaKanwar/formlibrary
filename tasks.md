@@ -1234,6 +1234,314 @@ Wire up all exports, rebuild the library, and run a full end-to-end verification
 
 ---
 
+### Task 25 — Implement Reusable Form Validation and Error Message Handling
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 24
+
+**Description:**
+Implement reusable validation and error message handling for required form fields. When a required field is empty and the form is submitted, the form should display a validation error message directly below that field. The validation mechanism should be scalable and work dynamically for all field types. By default, the fallback error message must be "This is a required field.", but the form component must support custom error messages provided in the field config (e.g., `errorMessage: "Email is mandatory."`), which override the default fallback.
+
+**Architecture Requirements:**
+- Validation should be reusable and scalable.
+- Error handling should work dynamically for all field types.
+- Error messages should render below the field.
+- Error text should use reusable CSS styling.
+- `BaseField` can be used for shared error rendering logic.
+- Default error message should be used as fallback.
+- Custom `errorMessage` prop should override default message.
+
+**UI Requirements:**
+- Error text color should be red.
+- Error spacing should remain consistent.
+- Labels should stay left aligned.
+- Form layout should not break when errors appear.
+
+**Steps:**
+1. Update `BaseField` (or respective field components) to accept an optional `error` or `errorMessage` prop and render it below the input field if present.
+2. In `BaseField.css`, add reusable styling for validation errors (e.g., `.base-field__error` class) ensuring text color is red and margins/padding provide consistent spacing.
+3. Update `Form.js` to manage form submission validation state. When submission is triggered, check all fields to ensure required ones are not empty.
+4. Set validation error messages dynamically: if a required field is empty, set its error to the custom `errorMessage` from the field config if it exists, otherwise fall back to `"This is a required field."`.
+5. Pass the error state down to the field components so they display the message correctly.
+6. Rebuild the library using `npm run build` and link/verify in `my-ui-test-app` that layout does not break when errors appear and that custom/default error messages render correctly.
+
+**Output Criteria:**
+- Submitting the form with empty required fields triggers validation and displays error messages.
+- Error messages render below the fields with a consistent layout and left-aligned labels.
+- Error text color is red and spacing is consistent.
+- Custom `errorMessage` prop overrides the default fallback message `"This is a required field."`.
+
+---
+
+### Task 26 — Implement Reusable Form State Handling
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 25
+
+**Description:**
+Implement internal form state management inside `Form.js` to collect, manage, and return form data when the form is submitted or values change. The form values should be stored in an internal state keyed by each field's unique `name` property. The collected form values should be exposed back to the user via callbacks such as `onSubmit` and `onChange`, avoiding tight coupling (e.g., do NOT ask users to pass `setState` directly into the component).
+
+**Architecture Requirements:**
+- **Isolated Internal State:** `Form.js` must manage internal form state. Never ask the user to pass a state setter directly (e.g., do NOT use `<Form setState={setFormData} />` as it tightly couples user state with the library).
+- **Dynamic Field Updates:** Field updates should dynamically update the internal state for all field types.
+- **Unique Name Keys:** Every field configuration object must support a unique `name` property which acts as the key for storing that field's value in state.
+- **onSubmit Callback:** Form values must be returned to the consumer using the `onSubmit` callback upon form submission.
+- **Reusable and Scalable:** The state management architecture must remain isolated, reusable, and scalable to support future fields.
+
+**Expected Usage:**
+```jsx
+const formData = [
+  {
+    label: "Email",
+    name: "email",
+    type: "email",
+    required: true,
+  },
+];
+
+function App() {
+  const handleSubmit = (values) => {
+    console.log(values);
+  };
+
+  return (
+    <Form
+      data={formData}
+      onSubmit={handleSubmit}
+    />
+  );
+}
+```
+
+**Expected Output Format:**
+On form submit, the callback should return an object containing the field names and their current values:
+```json
+{
+  "fullName": "John",
+  "email": "john@gmail.com",
+  "gender": "Male"
+}
+```
+
+**Steps:**
+1. Update the component input interface in `Form.js` to support the `onSubmit` and optional `onChange` callbacks.
+2. Define internal state (e.g., using `useState`) in `Form.js` to hold the form's field values.
+3. Ensure every field object in the `data` array uses its `name` property as the key (e.g., `field.name`).
+4. Update dynamic rendering to pass the current value and a change handler to each field component resolved via `fieldMapper`.
+5. Implement the change handler function inside `Form.js` to dynamically update the state key matching the field's `name` when a user types or selects a value.
+6. Handle validation alongside state management (ensuring invalid inputs block the `onSubmit` callback).
+7. In the submit handler, call the consumer's `onSubmit` handler, passing the collected form values.
+8. Rebuild the library using `npm run build` and link/verify in `my-ui-test-app` that form values are printed correctly to the console on submission.
+
+**Output Criteria:**
+- The form component internally manages state without requiring the user to pass down a state setter directly.
+- Form fields are identified by a unique `name` property, which acts as the key for storing form values.
+- Dynamic field updates successfully capture changes for all input types.
+- The `onSubmit` callback exposes the accumulated form data object to the consumer upon successful submission.
+- The library compiles successfully with no build or runtime console errors.
+
+---
+
+### Task 27 — Implement Global and Field-Level Styling Customization
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 26
+
+**Description:**
+Create a scalable styling system that allows users to customize the appearance of form fields without modifying library code. The styling system must support global form styling (via a `formStyles` prop) and field-level styling (via field-specific `className` and `style` properties).
+
+**Architecture Requirements:**
+- **Single Scalable Object:** Avoid creating many styling props like `labelColor`, `borderColor`, `fieldGap`, etc. Use a single scalable `formStyles` object on the `<Form>` component.
+- **BaseField Consumption:** `BaseField` should consume shared styles from the global `formStyles` configuration.
+- **Support in all fields:** All individual field components must support custom inline `style` and `className` overrides.
+- **Style Priority:** Implement and document the styling priority:
+  `Default Library CSS`
+  ↓
+  `Global formStyles`
+  ↓
+  `Field-specific style`
+  (Field-level styles must override global styles when conflicts occur).
+- **Reusable and Scalable:** The styling architecture must remain reusable, clean, and extensible for future field types.
+
+**Global Styling Requirement:**
+The `Form` component must support a new `formStyles` prop:
+```jsx
+<Form
+  data={formData}
+  formStyles={{
+    formContainer: {},
+    fieldWrapper: {},
+    label: {},
+    input: {},
+    error: {}
+  }}
+/>
+```
+Purpose:
+- Customize all labels (e.g., color, font size, font weight)
+- Customize all inputs (e.g., border color, border radius, padding)
+- Customize field spacing (gap between labels and fields, gap between fields)
+- Customize form spacing (padding, margin, outer container flex spacing)
+- Customize error message appearance (color, font size, etc.)
+
+Examples of supported use cases:
+- Label color
+- Label font size
+- Label font weight
+- Input border color
+- Input border radius
+- Input padding
+- Gap between label and field
+- Gap between fields
+- Error message color
+
+**Field-Level Styling Requirement:**
+Each field configuration object in the `data` array must support:
+- `className` (string) — Allow custom class names for the field.
+- `style` (object) — Allow custom inline styles.
+
+Example field configuration:
+```js
+{
+  label: "Email",
+  name: "email",
+  type: "email",
+  className: "custom-email",
+  style: {
+    borderRadius: "10px"
+  }
+}
+```
+Purpose:
+- Override styles for a single field.
+- Allow custom class names.
+- Allow custom inline styles.
+
+**Test App Verification Task:**
+Update the local test application (`my-ui-test-app`) to demonstrate and verify the styling system.
+The test application must demonstrate:
+- Global label styling
+- Global input styling
+- Global error styling
+- Gap between fields
+- Field-specific style override
+- Field-specific className usage
+
+Example test setup in the companion app:
+```jsx
+<Form
+  data={formData}
+  formStyles={{
+    label: {
+      color: "blue"
+    },
+    input: {
+      borderRadius: "8px"
+    },
+    error: {
+      color: "red"
+    }
+  }}
+  onSubmit={handleSubmit}
+/>
+```
+And:
+```js
+{
+  label: "Email",
+  name: "email",
+  type: "email",
+  style: {
+    borderColor: "green"
+  }
+}
+```
+
+Verify that:
+- [ ] All fields receive global styles.
+- [ ] Email field correctly overrides the global border style.
+- [ ] Form remains functional after styling changes.
+
+**Steps:**
+1. Update `Form.js` to accept the `formStyles` prop and pass relevant global styling values down to the dynamically rendered field components.
+2. Update the field rendering loop to pass global styling configurations (`label`, `input`, `fieldWrapper`, `error`) and the specific field-level `style` and `className` properties down to individual field components.
+3. Update `BaseField` to accept global `label`, `fieldWrapper`, and `error` style configurations, applying them appropriately while ensuring field-level overrides take precedence.
+4. Refactor all field components resolved via `fieldMapper` to support both `className` and `style` props, passing them to their root wrapper elements or core `<input>` elements as specified by the priority hierarchy: Default CSS -> Global `formStyles` -> Field-specific `style`.
+5. Update the local test application (`my-ui-test-app/src/App.jsx`) to render a form using the global and field-level styling options.
+6. Rebuild the library using `npm run build` and link/verify that global and field-specific styling works correctly.
+
+**Output Criteria:**
+- The form component supports the `formStyles` prop containing `formContainer`, `fieldWrapper`, `label`, `input`, and `error` keys.
+- Every field configuration object supports custom `className` and inline `style` overrides.
+- Styling priority is correctly implemented: Field-specific styles override global styles, which override default CSS.
+- The test app successfully demonstrates global and field-level styling customization without console errors.
+
+---
+
+### Task 28 — Enhance Styling System with Global Label Gap and Field-Level Label Styling
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 27
+
+**Description:**
+Enhance the styling system to support global label-to-input gap and field-level label styling. This ensures better flexibility for customizing individual labels and controlling overall field layout spacing without manually styling each field.
+
+**Architecture Requirements:**
+- **BaseField Support:** `BaseField` must support both field-level `labelStyle` and global `labelGap`.
+- **Reusable Styling:** Label styling should be reusable across all field types, and the styling system should remain scalable.
+- **Minimal Props:** Avoid adding many individual styling props; continue using the `formStyles` object for global customization.
+- **Updated Styling Priority:**
+  `Default Library CSS`
+  ↓
+  `Global formStyles`
+  ↓
+  `Field-specific labelStyle`
+  ↓
+  `Field-specific style`
+  (Field-specific styling should always take precedence).
+
+**Field-Level Label Styling Requirements:**
+- A field configuration object in the `data` array can support a `labelStyle` object (e.g., `labelStyle: { color: "green", fontWeight: "bold", fontSize: "16px" }`).
+- `labelStyle` must only affect that specific field's label.
+- The existing `style` prop on the field configuration must continue to affect only that field's input/control.
+- Both `labelStyle` and `style` must override global styles when provided.
+
+**Global Label-to-Field Gap Requirements:**
+- The `formStyles` object on the `<Form>` component must support `labelGap` to control spacing between labels and fields globally (e.g., `<Form formStyles={{ labelGap: "8px" }} />`).
+- The `labelGap` property must maintain a consistent layout across all fields and avoid manual spacing on a per-field basis.
+
+**Test App Verification Requirements:**
+Update the local test application (`my-ui-test-app/src/App.jsx`) to demonstrate and verify the styling enhancements:
+- Set global label color, global label-to-input gap (`labelGap`), and global input border styling.
+- Set field-specific `labelStyle` override and field-specific input `style` override for a single field (e.g., "Email").
+- Verify that:
+  - [x] Only the Email label becomes green.
+  - [x] Only the Email input gets a green border.
+  - [x] Other fields continue using global styles.
+  - [x] Global `labelGap` is applied consistently across all fields.
+
+**Steps:**
+1. Update `Form.js` to extract `labelGap` from `formStyles` and pass it down to individual field components or `BaseField`.
+2. Update `BaseField.js` to accept `labelStyle` and `labelGap` props. Apply `labelGap` as a margin/gap style (e.g., setting the margin or gap on the field wrapper/container), and apply `labelStyle` directly to the `<label>` element.
+3. Ensure that all field components resolved via `fieldMapper` forward `labelStyle` and the global `labelGap` to `BaseField` while passing `style` to the input element.
+4. Update the local test application (`my-ui-test-app/src/App.jsx`) to render the form with the styling configurations.
+5. Rebuild the library using `npm run build` and verify that the styling rules apply properly in the browser.
+
+**Output Criteria:**
+- `BaseField` supports the global `labelGap` style and specific `labelStyle` override.
+- Field-specific `labelStyle` and `style` override the corresponding global styles while leaving other fields unaffected.
+- The test app successfully demonstrates the styling priority hierarchy and global `labelGap` with no console errors.
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -1263,6 +1571,10 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
             └── Task 22 (fieldMapper Utility)
                  └── Task 23 (Refactor Form.js)
                       └── Task 24 (Export All & Full Local Test)
+                           └── Task 25 (Reusable Form Validation & Errors)
+                                └── Task 26 (Reusable Form State Handling)
+                                     └── Task 27 (Global & Field-Level Styling Customization)
+                                          └── Task 28 (Enhance Styling System with Global Label Gap and Field-Level Label Styling)
 ```
 
 ---
@@ -1282,4 +1594,4 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
 
 ---
 
-*Last updated: 2026-05-20 | Conversation ID: a0e0a5aa-63e9-4289-8e77-9f03e68ba01d*
+*Last updated: 2026-06-04 | Conversation ID: 17adbd17-e4dd-4640-a3ca-6513f4eaf0b4*
