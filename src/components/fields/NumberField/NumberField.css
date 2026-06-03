@@ -1,0 +1,14 @@
+.number-field__input {
+  padding: 10px 12px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.number-field__input:focus {
+  border-color: #4f46e5;
+}

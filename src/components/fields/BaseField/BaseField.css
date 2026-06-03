@@ -1,0 +1,18 @@
+.base-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.base-field__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  text-align: left;
+}
+
+.base-field__required {
+  color: #ef4444;
+  margin-left: 2px;
+}
