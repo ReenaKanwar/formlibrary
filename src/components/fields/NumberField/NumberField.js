@@ -1,11 +1,11 @@
 import './NumberField.css';
 import { BaseField } from '../BaseField';
 
-export function NumberField({ label, required, value, onChange, placeholder, min, max, step }) {
+export function NumberField({ label, required, errorMessage, value, onChange, placeholder, min, max, step, formStyles = {}, className, style, labelStyle, labelGap }) {
   return (
-    <BaseField label={label} required={required}>
+    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       <input
-        className="number-field__input"
+        className={`number-field__input ${className || ''}`}
         type="number"
         value={value}
         onChange={onChange}
@@ -14,6 +14,7 @@ export function NumberField({ label, required, value, onChange, placeholder, min
         min={min}
         max={max}
         step={step}
+        style={{ ...(formStyles.input || {}), ...(style || {}) }}
       />
     </BaseField>
   );
