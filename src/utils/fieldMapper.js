@@ -2,6 +2,7 @@ import { TextField }    from '../components/fields/TextField';
 import { EmailField }   from '../components/fields/EmailField';
 import { PasswordField } from '../components/fields/PasswordField';
 import { CheckboxField } from '../components/fields/CheckboxField';
+import { CheckboxGroupField } from '../components/fields/CheckboxGroupField';
 import { RadioField }   from '../components/fields/RadioField';
 import { SelectField }  from '../components/fields/SelectField';
 import { TextAreaField } from '../components/fields/TextAreaField';
@@ -14,6 +15,7 @@ export const fieldMapper = {
   email:    EmailField,
   password: PasswordField,
   checkbox: CheckboxField,
+  checkboxGroup: CheckboxGroupField,
   radio:    RadioField,
   select:   SelectField,
   textarea: TextAreaField,

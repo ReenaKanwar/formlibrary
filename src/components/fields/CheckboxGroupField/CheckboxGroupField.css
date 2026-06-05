@@ -1,0 +1,11 @@
+.checkbox-group-field__option-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.checkbox-group-field__input {
+  cursor: pointer;
+}

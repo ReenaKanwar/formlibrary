@@ -1542,6 +1542,16 @@ Update the local test application (`my-ui-test-app/src/App.jsx`) to demonstrate 
 
 ---
 
+### Task 29 — Implement multiple selection checkboxGroup field
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 28
+
+**Description:**
+Add a new `checkboxGroup` field type to `formLibrary` that supports multiple selections from a given array of options. Update the `CheckboxGroupField` CSS to allow natural flex layout without forcing a `flex-direction: column`, enabling developers to control layout via the `style` prop. Verify by providing single-column and multi-column examples in the local test app.
+
 ## 📌 Task Dependency Map
 
 ```
@@ -1575,6 +1585,7 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
                                 └── Task 26 (Reusable Form State Handling)
                                      └── Task 27 (Global & Field-Level Styling Customization)
                                           └── Task 28 (Enhance Styling System with Global Label Gap and Field-Level Label Styling)
+                                               └── Task 29 (Implement multiple selection checkboxGroup field)
 ```
 
 ---
