@@ -1552,6 +1552,341 @@ Update the local test application (`my-ui-test-app/src/App.jsx`) to demonstrate 
 **Description:**
 Add a new `checkboxGroup` field type to `formLibrary` that supports multiple selections from a given array of options. Update the `CheckboxGroupField` CSS to allow natural flex layout without forcing a `flex-direction: column`, enabling developers to control layout via the `style` prop. Verify by providing single-column and multi-column examples in the local test app.
 
+---
+
+# Phase 4 - Advanced Form Features
+
+## Task 30 - Create ConditionalForm Component
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:**
+
+**Description:**
+Create a new reusable component `<ConditionalForm />` that is separate from the existing `Form` component. Its purpose is to handle conditional field rendering, field dependencies, dynamic form flows, advanced questionnaires, and dynamic survey forms. This component must remain independent from the existing `Form` component, which should continue working exactly as it does today.
+
+### Architecture Requirements
+Create a new component structure:
+- `src/components/ConditionalForm/ConditionalForm.js`
+- `src/components/ConditionalForm/ConditionalForm.css`
+- `src/components/ConditionalForm/index.js`
+
+Export `ConditionalForm` from `src/index.js`. Usage should support:
+```jsx
+import { ConditionalForm } from "my-ui-library";
+```
+
+### Condition Configuration
+Do NOT use raw JavaScript expressions inside configurations (do NOT support `happy === "Yes"` or `age > 18` inside config). Use a structured condition object:
+```json
+{
+  "label": "Describe your experience",
+  "name": "description",
+  "type": "textarea",
+  "condition": {
+    "logic": "AND",
+    "rules": [
+      {
+        "field": "happy",
+        "operator": "equals",
+        "value": "Yes"
+      }
+    ]
+  }
+}
+```
+
+### Multiple Field Dependencies
+The architecture must support conditions based on multiple fields:
+```json
+{
+  "label": "Describe your experience",
+  "name": "description",
+  "type": "textarea",
+  "condition": {
+    "logic": "AND",
+    "rules": [
+      {
+        "field": "happy",
+        "operator": "equals",
+        "value": "Yes"
+      },
+      {
+        "field": "age",
+        "operator": "greaterThan",
+        "value": 18
+      }
+    ]
+  }
+}
+```
+Fields should render only when all rules are satisfied.
+
+### Supported Logic
+- `AND`
+- `OR`
+
+### Supported Operators
+- `equals`
+- `notEquals`
+- `greaterThan`
+- `greaterThanOrEqual`
+- `lessThan`
+- `lessThanOrEqual`
+- `contains`
+- `includes`
+- `startsWith`
+- `endsWith`
+
+### Validation Requirement
+Hidden fields must:
+- Not render
+- Not be validated
+- Not show errors
+- Not block form submission
+
+Only visible fields should participate in validation.
+
+### Submission Requirement
+The component should:
+- Maintain internal state
+- Support `onSubmit` callback
+- Return submitted values
+- Ignore hidden fields during validation
+
+### Test Application Requirement
+Update the local test application with examples covering:
+- **Scenario 1:**
+  - Question: "Are you happy?" (Options: "Yes", "No")
+  - When "Yes": Show "Describe why you are happy"
+  - When "No": Show "Describe why you are not happy"
+- **Scenario 2:**
+  - Render a field only when: `Happy = Yes AND Age > 18`
+- **Verify:**
+  - Conditional rendering
+  - Validation
+  - State updates
+  - Form submission
+  - Hidden field behavior
+
+### Steps:
+- [ ] Create the component files under `src/components/ConditionalForm/`
+- [ ] Implement conditional rule evaluation logic supporting all listed operators and logic gates (`AND`, `OR`)
+- [ ] Build the dynamic rendering flow based on internal state changes in `ConditionalForm`
+- [ ] Implement validation that is skipped for hidden fields
+- [ ] Implement state retrieval and filtering to return only visible values on submit
+- [ ] Export `ConditionalForm` from `src/index.js`
+- [ ] Update companion test app to showcase Scenario 1 and Scenario 2 and verify implementation
+
+### Output Criteria:
+- `<ConditionalForm />` component exists, separate from `<Form />`
+- Configuration conditions are processed structurally, not via raw evaluation of strings
+- Visibility updates dynamically, hiding inputs and clearing their validation state/errors
+- Submit returns only visible fields
+- Local test app verifies all conditional scenarios correctly
+
+---
+
+## Task 31 - Add CheckboxGroup Conditional Rendering Support
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 30
+
+**Requirement:**
+The current `ConditionalForm` implementation does not properly support conditional rendering based on `CheckboxGroup` selections.
+We need to enhance the condition engine to support conditions on fields that return an array of selected values.
+
+### Example
+
+**CheckboxGroup:**
+```json
+{
+  "label": "Select Options",
+  "name": "selectedOptions",
+  "type": "checkboxGroup",
+  "options": [
+    "Option 1",
+    "Option 2",
+    "Option 3",
+    "Option 4",
+    "Option 5"
+  ]
+}
+```
+
+**Conditional field:**
+```json
+{
+  "label": "Please provide additional details",
+  "name": "details",
+  "type": "textarea",
+  "condition": {
+    "logic": "AND",
+    "rules": [
+      {
+        "field": "selectedOptions",
+        "operator": "includes",
+        "value": "Option 2"
+      },
+      {
+        "field": "selectedOptions",
+        "operator": "includes",
+        "value": "Option 3"
+      }
+    ]
+  }
+}
+```
+
+### Expected Behavior
+- Field remains hidden initially
+- Field remains hidden when only Option 2 is selected
+- Field remains hidden when only Option 3 is selected
+- Field becomes visible when Option 2 and Option 3 are both selected
+- Field hides again if either option is unchecked
+
+### Architecture Requirements
+- Condition engine must support array-based field values
+- `includes` operator must work correctly for `CheckboxGroup` fields
+- Support `AND` and `OR` logic with checkbox conditions
+- Keep implementation generic so it works with any `CheckboxGroup` field
+- Hidden fields should not be validated
+- Hidden fields should not appear in submitted data
+
+### Test App Requirement
+Update `my-test-ui-app` with a `CheckboxGroup` example that verifies:
+- Single checkbox condition
+- Multiple checkbox conditions using `AND` logic
+- Multiple conditional fields rendered from the same `CheckboxGroup`
+- Validation and submission behavior
+
+### Steps:
+- [x] Update `conditionEvaluator.js` to handle array values for `includes` and `contains` operators
+- [x] Ensure validation logic ignores hidden fields correctly for checkboxGroup dependencies
+- [x] Add the test case into `my-ui-test-app/src/App.jsx`
+
+---
+
+## Task 32 - Add Responsive Grid Layout Support
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 30, Task 31
+
+**Description:**
+Add responsive grid layout support to both `<Form />` and `<ConditionalForm />` without creating separate components (like `GridForm` or `ConditionalGridForm`). Grid layout must be field-based, treating layout as a presentation concern that works seamlessly with other form features.
+
+### Architecture Requirements
+- Grid support must be field-based (configured directly on individual field definitions).
+- Do not create a separate `GridForm` or `ConditionalGridForm` component.
+- `<Form />` and `<ConditionalForm />` must share the same grid rendering system.
+- Grid must be independent of validation logic and condition evaluation logic.
+- The grid system should remain reusable and scalable.
+- The grid layout should automatically adjust based on visible fields in `<ConditionalForm />`. When fields are hidden, they must not leave empty grid spaces.
+
+### Grid Configuration Spec
+Each field configuration can support a `grid` object:
+```js
+grid: {
+  xs: 12, // mobile
+  sm: 6,  // tablet
+  md: 4,  // small desktop
+  lg: 3   // large desktop
+}
+```
+- Grid values are based on a 12-column system (e.g., 12 is full width, 6 is half width, 4 is one-third width, 3 is one-quarter width).
+- Default behavior: if no `grid` configuration is provided, fields default to `{ xs: 12, md: 12 }` (full-width).
+
+### Styling Requirements
+- Reusable grid styling utilizing Vanilla CSS (e.g., CSS Grid or Flexbox grid wrapper).
+- Support configurable row gap and column gap through the existing `formStyles` config:
+  ```jsx
+  <Form
+    formStyles={{
+      grid: {
+        rowGap: "20px",
+        columnGap: "16px"
+      }
+    }}
+  />
+  ```
+- Must support responsive behavior, automatic wrapping, and clean layout presentation.
+
+### Test Application Requirements
+Update `my-ui-test-app` to include the following examples to verify grid functionality:
+- **Example 1: Two-column form**
+  - First Name (md: 6, xs: 12) | Last Name (md: 6, xs: 12)
+  - Address (md: 12, xs: 12)
+  - Email (md: 12, xs: 12)
+- **Example 2: Three-column form**
+  - City (md: 4, xs: 12) | State (md: 4, xs: 12) | Country (md: 4, xs: 12)
+- **Example 3: Conditional rendering + grid**
+  - Employment Status (md: 6) | Company Name (md: 6, only visible when employed is "Yes")
+  - Verify that when "Company Name" is hidden, the layout behaves correctly without empty grid slots, and automatically wraps/fills columns when visible.
+- **Verification criteria**:
+  - Responsive layout works.
+  - Field wrapping works.
+  - Hidden fields do not leave empty grid spaces.
+  - Validation still functions correctly.
+  - Form submission remains unchanged.
+
+### Steps:
+- [x] Implement grid wrapper styles and grid item class generation in `formLibrary`.
+- [x] Update field components or their wrapping structures to accept responsive grid classes/styles.
+- [x] Enable `rowGap` and `columnGap` customization via `formStyles.grid` in both `<Form />` and `<ConditionalForm />`.
+- [x] Ensure that hidden fields in `<ConditionalForm />` do not output empty grid elements.
+- [x] Add Example 1, 2, and 3 layouts inside `my-ui-test-app/src/App.jsx`.
+- [x] Rebuild library and verify grid responsive wrapping, validation, and submission behavior in the test app.
+
+---
+
+## Task 33 - Add Default Responsive Grid Fallback Support
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 32
+
+**Description:**
+Enhance the grid layout system used by both `<Form />` and `<ConditionalForm />` to automatically apply responsive defaults when breakpoint values are not provided. Currently, users must explicitly define `xs: 12` (e.g. `grid: { xs: 12, md: 6 }`), creating unnecessary configuration overhead. The grid system should automatically assume sensible defaults (e.g. `xs: 12` if `xs` is missing).
+
+### Requirements:
+- If a field configuration contains a `grid` object but `xs` is missing, the library should internally default `xs` to `12`.
+- Examples:
+  - `grid: { md: 6 }` behaves as `grid: { xs: 12, md: 6 }`
+  - `grid: { md: 4 }` behaves as `grid: { xs: 12, md: 4 }`
+  - `grid: { md: 12 }` behaves as `grid: { xs: 12, md: 12 }`
+- This ensures all fields become full-width on mobile devices by default.
+- The same fallback behavior must apply to `<ConditionalForm />`. Conditional fields should automatically become full width on mobile when `xs` is not specified.
+
+### Architecture Requirements:
+- Add a reusable grid normalization utility, e.g., `normalizeGrid(grid)`.
+- Purpose:
+  - Normalize grid configuration before rendering.
+  - Apply default breakpoint values.
+  - Avoid duplicate logic in `Form` and `ConditionalForm`.
+- Both `<Form />` and `<ConditionalForm />` must use this shared utility.
+
+### Test Application Requirements:
+Update `my-ui-test-app` with test cases verifying:
+1. Field with only `md: 6` becomes full width on mobile.
+2. Two `md: 6` fields render side-by-side on desktop.
+3. Conditional fields follow the same behavior.
+4. Existing fields with explicit `xs` values continue to work.
+5. Hidden conditional fields do not break the grid layout.
+
+### Steps:
+- [x] Create/implement a reusable `normalizeGrid` utility in the library.
+- [x] Refactor `<Form />` and `<ConditionalForm />` to use `normalizeGrid` before rendering fields.
+- [x] Update `my-ui-test-app` to include test cases verifying the fallback behavior for static and conditional fields under different screen widths.
+- [x] Rebuild the library and verify layout responsive behavior in the browser.
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -1585,7 +1920,11 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
                                 └── Task 26 (Reusable Form State Handling)
                                      └── Task 27 (Global & Field-Level Styling Customization)
                                           └── Task 28 (Enhance Styling System with Global Label Gap and Field-Level Label Styling)
-                                               └── Task 29 (Implement multiple selection checkboxGroup field)
+                                                └── Task 29 (Implement multiple selection checkboxGroup field)
+                                                     └── Task 30 (Create ConditionalForm Component)
+                                                          └── Task 31 (Add CheckboxGroup Conditional Rendering Support)
+                                                                └── Task 32 (Add Responsive Grid Layout Support)
+                                                                     └── Task 33 (Default Grid Fallback Support)
 ```
 
 ---
@@ -1605,4 +1944,163 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
 
 ---
 
-*Last updated: 2026-06-04 | Conversation ID: 17adbd17-e4dd-4640-a3ca-6513f4eaf0b4*
+*Last updated: 2026-06-06 | Conversation ID: 359bca82-5501-47bc-9a0e-d54412b06ee1*
+
+
+---
+*Dumy data to be used.
+
+const formData = [
+  { label: "Full Name", name: "fullName", type: "text", required: true },
+  {
+    label: "Email",
+    name: "email",
+    type: "email",
+    required: true,
+    errorMessage: "Email is mandatory.",
+    className: "custom-email",
+    labelStyle: { color: "green", fontWeight: "bold" },
+    style: { borderRadius: "10px", borderColor: "green" },
+  },
+  { label: "Password", name: "password", type: "password", required: true },
+  { label: "Age", name: "age", type: "number", required: false },
+  { label: "Birth Date", name: "birthDate", type: "date", required: false },
+  { label: "Gender", name: "gender", type: "radio", options: ["Male", "Female"], required: true },
+  { label: "Subscribe", name: "subscribe", type: "checkbox", required: false },
+  { label: "Country", name: "country", type: "select", options: ["India", "USA", "UK"], required: false },
+  { label: "Country Object", name: "countryObj", type: "select", options: [{ value: "IND", label: "India" }, { value: "USA", label: "United States of America" }, { value: "UK", label: "United Kingdom" }], required: false },
+  { label: "Bio", name: "bio", type: "textarea", required: false },
+  { label: "Hobbies", name: "hobbies", type: "checkboxGroup", options: ["Reading", "Sports", "Music", "Traveling"], required: false },
+  { 
+    label: "Skills", 
+    name: "skills", 
+    type: "checkboxGroup", 
+    options: ["React", "Node.js", "Python", "Java"], 
+    required: false,
+    style: { display: "flex", gap: "5px" }
+  },
+  { label: "Resume", name: "resume", type: "file", required: false },
+];
+
+const conditionalFormData = [
+  { label: "Are you happy?", name: "happy", type: "radio", options: ["Yes", "No"], required: true },
+  { 
+    label: "Describe why you are happy", 
+    name: "happyReason", 
+    type: "textarea", 
+    required: true,
+    condition: { logic: "AND", rules: [{ field: "happy", operator: "equals", value: "Yes" }] }
+  },
+  { 
+    label: "Describe why you are not happy", 
+    name: "unhappyReason", 
+    type: "textarea", 
+    required: true,
+    condition: { logic: "AND", rules: [{ field: "happy", operator: "equals", value: "No" }] }
+  },
+  { label: "Age", name: "age", type: "number", required: true },
+  {
+    label: "Adult Happy Thoughts",
+    name: "adultThoughts",
+    type: "textarea",
+    required: true,
+    condition: {
+      logic: "AND",
+      rules: [
+        { field: "happy", operator: "equals", value: "Yes" },
+        { field: "age", operator: "greaterThan", value: 18 }
+      ]
+    }
+  },
+  {
+    label: "Select Options",
+    name: "selectedOptions",
+    type: "checkboxGroup",
+    options: [
+      "Option 1",
+      "Option 2",
+      "Option 3",
+      "Option 4",
+      "Option 5",
+    ],
+    required: true,
+  },
+  {
+    label: "Please provide additional details",
+    name: "details",
+    type: "textarea",
+    condition: {
+      logic: "AND",
+      rules: [
+        {
+          field: "selectedOptions",
+          operator: "includes",
+          value: "Option 2",
+        },
+        {
+          field: "selectedOptions",
+          operator: "includes",
+          value: "Option 3",
+        },
+      ],
+    },
+  },
+  {
+    label: "Why did you choose Option 4?",
+    name: "option4Reason",
+    type: "text",
+    condition: {
+      logic: "AND",
+      rules: [
+        {
+          field: "selectedOptions",
+          operator: "includes",
+          value: "Option 4",
+        },
+      ],
+    },
+  },
+];
+
+const gridFormData = [
+  { label: "First Name", name: "firstName", type: "text", grid: { md: 6 }, required: true },
+  { label: "Last Name", name: "lastName", type: "text", grid: { md: 6 }, required: true },
+  { label: "Address", name: "address", type: "textarea", grid: { md: 12, xs: 12 } },
+  { label: "Email", name: "email", type: "email", grid: { md: 12, xs: 12 }, required: true },
+  { label: "City", name: "city", type: "text", grid: { md: 4 } },
+  { label: "State", name: "state", type: "text", grid: { md: 4 } },
+  { label: "Country", name: "country", type: "text", grid: { md: 4 } }
+];
+
+const gridConditionalFormData = [
+  { label: "Employment Status", name: "employed", type: "radio", options: ["Yes", "No"], grid: { md: 6 }, required: true },
+  { 
+    label: "Company Name", 
+    name: "companyName", 
+    type: "text", 
+    grid: { md: 6 },
+    condition: { logic: "AND", rules: [{ field: "employed", operator: "equals", value: "Yes" }] },
+    required: true
+  },
+  {
+    label: "Select Options",
+    name: "selectedOptions",
+    type: "checkboxGroup",
+    options: ["Option 1", "Option 2", "Option 3"],
+    grid: { md: 12 },
+    required: false,
+  },
+  {
+    label: "Please provide additional details",
+    name: "details",
+    type: "textarea",
+    grid: { md: 12 },
+    condition: {
+      logic: "AND",
+      rules: [
+        { field: "selectedOptions", operator: "includes", value: "Option 2" },
+        { field: "selectedOptions", operator: "includes", value: "Option 3" },
+      ],
+    },
+  }
+];

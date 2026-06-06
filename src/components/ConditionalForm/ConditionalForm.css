@@ -1,16 +1,16 @@
-.form-wrapper {
+.conditional-form-wrapper {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 16px;
   width: 100%;
 }
 
-.form-submit-btn-wrapper {
+.conditional-form-submit-btn-wrapper {
   grid-column: span 12 / span 12;
   display: flex;
 }
 
-.form-submit-btn {
+.conditional-form-submit-btn {
   margin-top: 8px;
   padding: 10px 24px;
   background-color: #4f46e5;
@@ -20,8 +20,9 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  align-self: flex-start;
 }
 
-.form-submit-btn:hover {
+.conditional-form-submit-btn:hover {
   background-color: #4338ca;
 }

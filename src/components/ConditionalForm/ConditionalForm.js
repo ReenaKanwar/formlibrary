@@ -1,9 +1,10 @@
-import './Form.css';
+import './ConditionalForm.css';
 import { fieldMapper } from '../../utils/fieldMapper';
 import { useState } from 'react';
+import { evaluateCondition } from '../../utils/conditionEvaluator';
 import { normalizeGrid } from '../../utils/normalizeGrid';
 
-export function Form({ data = [], onSubmit, onChange, formStyles = {} }) {
+export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {} }) {
   const [values, setValues] = useState({});
   const [errors, setErrors] = useState({});
 
@@ -26,16 +27,23 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {} }) {
     }
   };
 
+  // Pre-calculate visible fields based on the condition evaluating to true.
+  const visibleFields = data.filter(field => {
+    if (!field.condition) return true;
+    return evaluateCondition(field.condition, values);
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
     let hasErrors = false;
 
-    data.forEach((field) => {
+    // Only validate currently visible fields
+    visibleFields.forEach((field) => {
       const key = field.name || field.label;
       if (field.required) {
         const val = values[key];
-        const isEmpty = val === undefined || val === null || val === "" || val === false;
+        const isEmpty = val === undefined || val === null || val === "" || val === false || (Array.isArray(val) && val.length === 0);
         if (isEmpty) {
           newErrors[key] = field.errorMessage || "This is a required field.";
           hasErrors = true;
@@ -48,8 +56,17 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {} }) {
       return;
     }
 
+    // Submit only the visible field values
+    const submittedValues = {};
+    visibleFields.forEach(field => {
+      const key = field.name || field.label;
+      if (values[key] !== undefined) {
+         submittedValues[key] = values[key];
+      }
+    });
+
     if (onSubmit) {
-      onSubmit(values);
+      onSubmit(submittedValues);
     }
   };
 
@@ -60,12 +77,12 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {} }) {
   }
 
   return (
-    <form className="form-wrapper" onSubmit={handleSubmit} noValidate style={containerStyle}>
-      {data.map((field, index) => {
+    <form className="conditional-form-wrapper" onSubmit={handleSubmit} noValidate style={containerStyle}>
+      {visibleFields.map((field, index) => {
         const FieldComponent = fieldMapper[field.type];
 
         if (!FieldComponent) {
-          console.warn(`Form: unknown field type "${field.type}"`);
+          console.warn(`ConditionalForm: unknown field type "${field.type}"`);
           return null;
         }
 
@@ -99,8 +116,8 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {} }) {
         );
       })}
 
-      <div className="form-submit-btn-wrapper">
-        <button type="submit" className="form-submit-btn">Submit</button>
+      <div className="conditional-form-submit-btn-wrapper">
+        <button type="submit" className="conditional-form-submit-btn">Submit</button>
       </div>
     </form>
   );
