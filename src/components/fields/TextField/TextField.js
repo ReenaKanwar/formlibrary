@@ -1,7 +1,7 @@
 import './TextField.css';
 import { BaseField } from '../BaseField';
 
-export function TextField({ label, required, errorMessage, value, onChange, placeholder, formStyles = {}, className, style, labelStyle, labelGap }) {
+export function TextField({ label, required, errorMessage, value, onChange, placeholder, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
   return (
     <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       <input
@@ -11,8 +11,10 @@ export function TextField({ label, required, errorMessage, value, onChange, plac
         onChange={onChange}
         placeholder={placeholder || label}
         required={required}
+        disabled={disabled}
         style={{ ...(formStyles.input || {}), ...(style || {}) }}
       />
     </BaseField>
   );
 }
+

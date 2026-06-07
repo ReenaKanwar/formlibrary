@@ -1,7 +1,7 @@
 import './RadioField.css';
 import { BaseField } from '../BaseField';
 
-export function RadioField({ label, required, errorMessage, value, onChange, options, name, formStyles = {}, className, style, labelStyle, labelGap }) {
+export function RadioField({ label, required, errorMessage, value, onChange, options, name, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
   return (
     <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       <div className={`radio-field__options ${className || ''}`} style={style || {}}>
@@ -15,6 +15,7 @@ export function RadioField({ label, required, errorMessage, value, onChange, opt
               checked={value === (option.value || option)}
               onChange={onChange}
               required={required}
+              disabled={disabled}
               style={formStyles.input || {}}
             />
             <span className="radio-field__option-text">{option.label || option}</span>
@@ -24,3 +25,4 @@ export function RadioField({ label, required, errorMessage, value, onChange, opt
     </BaseField>
   );
 }
+

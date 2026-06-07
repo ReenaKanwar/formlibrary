@@ -1887,6 +1887,393 @@ Update `my-ui-test-app` with test cases verifying:
 
 ---
 
+## Task 34 - Add Initial Values and Disabled Field Support
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 33
+
+**Description:**
+Enhance both `<Form />` and `<ConditionalForm />` to support prefilled form values via an `initialValues` prop and disabled fields via a field-level `disabled` property. This feature enables users to load existing form data, resume partially completed forms, edit previously saved forms, and display read-only fields.
+
+---
+
+### Part 1 — Prefilled Values Support
+
+#### Form-Level `initialValues` Prop
+
+Add support for a new `initialValues` prop on the `<Form />` component:
+
+```jsx
+<Form
+  data={formData}
+  initialValues={{
+    firstName: "John",
+    lastName: "Doe",
+    email: "john@gmail.com"
+  }}
+/>
+```
+
+**Purpose:**
+- Populate fields with existing data on initial render
+- Support edit forms (loading saved records)
+- Support draft forms (resuming partially completed forms)
+- Support API-loaded data pre-population
+
+When the form initializes, fields should automatically display the values provided in `initialValues`.
+
+#### Field-Level `defaultValue` Support
+
+Also support a field-level fallback value via `defaultValue`:
+
+```js
+{
+  label: "Country",
+  name: "country",
+  type: "text",
+  defaultValue: "India"
+}
+```
+
+This value is used **only** when the field's `name` is not present in `initialValues`.
+
+#### Value Priority Rule
+
+Implement the following strict priority order:
+
+```
+initialValues (highest priority)
+  ↓
+defaultValue (field-level fallback)
+  ↓
+empty string (lowest priority / default)
+```
+
+**Example:**
+
+Field config:
+```js
+{
+  name: "email",
+  defaultValue: "default@gmail.com"
+}
+```
+
+Form prop:
+```jsx
+initialValues={{
+  email: "actual@gmail.com"
+}}
+```
+
+Result displayed: `actual@gmail.com`
+
+---
+
+### Part 2 — Disabled Field Support
+
+Add support for a field-level `disabled` property:
+
+```js
+{
+  label: "User ID",
+  name: "userId",
+  type: "text",
+  defaultValue: "USR12345",
+  disabled: true
+}
+```
+
+**Purpose:**
+- Display read-only information in a form context
+- Prevent editing of specific fields (e.g., system-generated IDs)
+- Support profile and admin forms where some values must not change
+
+**Disabled field behavior:**
+- Renders normally within the form layout
+- Displays its current or prefilled value
+- Remains fully visible to the user
+- Does not allow user editing or input
+
+#### Field Component Coverage
+
+All supported field types must respect the `disabled` property. The disabled state must be passed through to the underlying HTML form control:
+
+| Field Type | Disabled Behavior |
+|------------|-------------------|
+| `text` | `<input disabled />` |
+| `email` | `<input disabled />` |
+| `password` | `<input disabled />` |
+| `number` | `<input disabled />` |
+| `date` | `<input disabled />` |
+| `textarea` | `<textarea disabled />` |
+| `select` | `<select disabled />` |
+| `radio` | All `<input type="radio" disabled />` |
+| `checkbox` | `<input type="checkbox" disabled />` |
+| `checkboxGroup` | All `<input type="checkbox" disabled />` |
+| Any other supported type | Respective control disabled |
+
+---
+
+### ConditionalForm Compatibility
+
+The same functionality must work identically inside `<ConditionalForm />`:
+
+- `initialValues` must populate conditional fields on initial render
+- Visible conditional fields must display their prefilled values correctly
+- Disabled conditional fields must remain non-editable regardless of visibility
+- Condition evaluation must continue working correctly based on prefilled values
+
+---
+
+### Architecture Requirements
+
+| Concern | Responsibility |
+|---------|----------------|
+| `initialValues` | Managed at `Form` / `ConditionalForm` level — passed as a prop |
+| `defaultValue` | Managed at field level — defined in the field config object |
+| `disabled` | Supported by all field components — passed through to native controls |
+| Backward compatibility | All existing APIs must remain unchanged and fully backward compatible |
+| Scalability | Implementation must be reusable and work for any future field types added |
+
+**Value resolution logic (to be implemented in `Form.js` and `ConditionalForm.js`):**
+
+```js
+const resolveInitialValue = (field, initialValues) => {
+  if (initialValues && initialValues[field.name] !== undefined) {
+    return initialValues[field.name];
+  }
+  if (field.defaultValue !== undefined) {
+    return field.defaultValue;
+  }
+  return '';
+};
+```
+
+This utility (or equivalent inline logic) must be called when building the initial internal state for the form.
+
+---
+
+### Test Application Requirement
+
+Update `my-test-ui-app` with the following four examples to verify the feature end-to-end:
+
+#### Example 1 — Prefilled Form via `initialValues`
+
+```jsx
+<Form
+  data={formData}
+  initialValues={{
+    firstName: "John",
+    lastName: "Doe",
+    email: "john@gmail.com"
+  }}
+/>
+```
+
+**Verify:**
+- [x] Values appear correctly on initial render without any user interaction
+- [x] Values can still be edited by the user (fields are not locked unless explicitly disabled)
+
+#### Example 2 — Field-Level `defaultValue`
+
+```js
+{
+  label: "Country",
+  name: "country",
+  type: "text",
+  defaultValue: "India"
+}
+```
+
+**Verify:**
+- [x] Default value `"India"` appears when `initialValues` does not include `country`
+- [x] Default value is overridden when `initialValues` provides a value for the same field
+
+#### Example 3 — Disabled Field
+
+```js
+{
+  label: "User ID",
+  name: "userId",
+  type: "text",
+  defaultValue: "USR12345",
+  disabled: true
+}
+```
+
+**Verify:**
+- [x] Value `"USR12345"` is visible on render
+- [x] The field cannot be edited by the user
+- [x] The field renders with a visually disabled appearance
+
+#### Example 4 — `ConditionalForm` with `initialValues` and Disabled Fields
+
+Construct a `ConditionalForm` with:
+- At least one conditionally visible field that has a prefilled value from `initialValues`
+- At least one field that is `disabled: true`
+
+**Verify:**
+- [x] Prefilled values render correctly in visible conditional fields
+- [x] Condition evaluation continues to work correctly (fields show/hide as expected)
+- [x] Disabled conditional fields remain non-editable when visible
+
+---
+
+### Steps:
+
+- [x] Add `resolveInitialValue` utility logic (in `Form.js`, `ConditionalForm.js`, or a shared utility file)
+- [x] Update `Form.js` to accept `initialValues` prop and initialize internal state using the value resolution priority rule
+- [x] Update `ConditionalForm.js` to accept `initialValues` prop and apply the same resolution logic
+- [x] Update all field components to accept and forward the `disabled` prop to their underlying HTML controls
+- [x] Apply appropriate disabled CSS styling (e.g., reduced opacity, `not-allowed` cursor) for visual clarity
+- [x] Rebuild the library using `npm run build`
+- [x] Re-link the library in `my-ui-test-app` via `npm install`
+- [x] Add all four examples in `my-ui-test-app/src/App.jsx` and verify in the browser
+
+### Output Criteria:
+
+- [x] `initialValues` prop populates form fields on initial render for both `<Form />` and `<ConditionalForm />`
+- [x] `defaultValue` is used as a fallback when the field's `name` is absent from `initialValues`
+- [x] Value priority is correctly enforced: `initialValues` > `defaultValue` > empty string
+- [x] `disabled: true` on a field renders it as non-editable across all supported field types
+- [x] Disabled fields display their values but prevent user input
+- [x] All existing form APIs remain backward compatible — no breaking changes
+- [x] `npm run build` completes with no errors
+- [x] Test app verifies all four examples with no console errors
+
+---
+
+## Task 35 - Add Custom Button System Support
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 34
+
+**Description:**
+Enhance both `<Form />` and `<ConditionalForm />` to support a configurable action button system. Currently, forms assume a fixed submit button behavior. We need a flexible system that allows consumer application developers to define custom button numbers, labels, types, callbacks, custom styling, and layout alignments while maintaining backward compatibility with the default submit behavior.
+
+---
+
+### Architecture & Design Requirements
+
+- **Reusability:** The button rendering and click handler logic must be reusable across both `<Form />` and `<ConditionalForm />`.
+- **Default Behavior:** If no `buttons` configuration is provided, automatically render the default submit button labeled `"Submit"`, which is equivalent to:
+  ```js
+  buttons: [
+    {
+      id: "submit",
+      label: "Submit",
+      type: "submit"
+    }
+  ]
+  ```
+- **Button Configuration Structure:** Support a `buttons` prop containing an array of button configuration objects:
+  ```jsx
+  <Form
+    data={formData}
+    buttons={[
+      {
+        id: "back",
+        label: "Back",
+        type: "button",
+        onClick: handleBack
+      },
+      {
+        id: "saveDraft",
+        label: "Save & Complete Later",
+        type: "button",
+        validate: false,
+        onClick: handleSaveDraft
+      },
+      {
+        id: "submit",
+        label: "Submit",
+        type: "submit",
+        onClick: handleSubmitClick
+      }
+    ]}
+  />
+  ```
+- **Supported Button Properties:**
+  - `id` (string): Unique identifier for the button.
+  - `label` (string): The text displayed inside the button.
+  - `type` (string): `"button"` or `"submit"`.
+  - `validate` (boolean): Whether validation should run before executing the callback. By default, `type: "submit"` always runs validation, whereas `type: "button"` defaults to not running validation.
+  - `onClick` (function): The callback function triggered on click, receiving latest form values (and visible values for conditional forms).
+  - `className` (string): Custom CSS class for button-level styling.
+  - `style` (object): Custom inline styling object for button-level customization.
+
+- **Validation Flow:**
+  - **Submit Button (`type: "submit"`) Flow:**
+    User clicks Submit button → Validate visible form fields → If invalid, display error messages and abort execution → If valid, invoke button-level `onClick(formValues)` and then trigger the Form-level `onSubmit(formValues)`.
+  - **Non-Submit Button (`type: "button"`) Flow:**
+    User clicks Button → If `validate` is false (default), skip validation and directly invoke `onClick(formValues)`.
+
+- **Button Callback Data:**
+  - All button callbacks (`onClick`) must receive the latest form values (e.g. `onClick(formValues)`), permitting draft saving, API calls, tracking, etc.
+
+- **Button Container Customization:**
+  - Support form-level configurations to customize the buttons wrapper/container alignment:
+    - `buttonContainerClassName` (string)
+    - `buttonContainerStyle` (object)
+
+- **Conditional Form Compatibility:**
+  - Validation must respect visible fields only. Hidden fields must not block validation.
+  - Button callbacks in `<ConditionalForm />` must receive only the currently visible form values.
+
+---
+
+### Test Application Requirements
+
+Update `my-ui-test-app` to include examples verifying this functionality:
+
+- **Example 1 — Default Submit Button:**
+  ```jsx
+  <Form data={formData} />
+  ```
+- **Example 2 — Back + Next Buttons:**
+  ```text
+  Back | Next
+  ```
+- **Example 3 — Back + Save Draft + Submit Buttons:**
+  ```text
+  Back | Save & Complete Later | Submit
+  ```
+- **Verification Criteria:**
+  - Submit buttons trigger validation, show errors when invalid, and invoke both button-level `onClick` and Form-level `onSubmit` on valid submission.
+  - Non-submit buttons (e.g., Back, Save Draft) bypass validation and invoke `onClick` directly.
+  - All button callbacks correctly receive the latest form values (or visible form values for `<ConditionalForm />`).
+  - Form-level `buttonContainerClassName` and `buttonContainerStyle` are applied correctly.
+  - Button-level `className` and `style` are applied correctly.
+
+---
+
+### Steps:
+
+- [x] Create a reusable button container rendering system/helper shared by both `<Form />` and `<ConditionalForm />`.
+- [x] Update `<Form />` to accept `buttons`, `buttonContainerClassName`, and `buttonContainerStyle` props, defaulting to the fallback Submit button if no `buttons` array is provided.
+- [x] Update `<ConditionalForm />` to support the custom buttons, passing only visible form values to the callbacks and validating only visible fields.
+- [x] Implement click flow handlers that distinguish between `"submit"` and `"button"` types and conditionally trigger validation prior to calling `onClick`.
+- [x] Rebuild the library (`npm run build`) and update `my-ui-test-app` dependency.
+- [x] Add Example 1, 2, and 3 layouts inside `my-ui-test-app/src/App.jsx`.
+- [x] Verify validation, callback parameter data, and styling customization in the browser.
+
+### Output Criteria:
+
+- [x] Reusable button system used by both `<Form />` and `<ConditionalForm />`.
+- [x] Default submit button remains available and backward compatible when no buttons configuration is provided.
+- [x] Custom buttons are customizable with unique labels, ids, classNames, and inline styles.
+- [x] Submit buttons run form validation; invalid fields block the action and show error messages.
+- [x] Non-submit buttons bypass validation by default and call their click handlers.
+- [x] Button callbacks (`onClick`) receive the latest form values (or visible form values in `<ConditionalForm />`).
+- [x] Form-level button container styling customizable via `buttonContainerClassName` and `buttonContainerStyle`.
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -1925,6 +2312,7 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
                                                           └── Task 31 (Add CheckboxGroup Conditional Rendering Support)
                                                                 └── Task 32 (Add Responsive Grid Layout Support)
                                                                      └── Task 33 (Default Grid Fallback Support)
+                                                                          └── Task 34 (Initial Values & Disabled Field Support) [Done]
 ```
 
 ---
@@ -1944,163 +2332,4 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
 
 ---
 
-*Last updated: 2026-06-06 | Conversation ID: 359bca82-5501-47bc-9a0e-d54412b06ee1*
-
-
----
-*Dumy data to be used.
-
-const formData = [
-  { label: "Full Name", name: "fullName", type: "text", required: true },
-  {
-    label: "Email",
-    name: "email",
-    type: "email",
-    required: true,
-    errorMessage: "Email is mandatory.",
-    className: "custom-email",
-    labelStyle: { color: "green", fontWeight: "bold" },
-    style: { borderRadius: "10px", borderColor: "green" },
-  },
-  { label: "Password", name: "password", type: "password", required: true },
-  { label: "Age", name: "age", type: "number", required: false },
-  { label: "Birth Date", name: "birthDate", type: "date", required: false },
-  { label: "Gender", name: "gender", type: "radio", options: ["Male", "Female"], required: true },
-  { label: "Subscribe", name: "subscribe", type: "checkbox", required: false },
-  { label: "Country", name: "country", type: "select", options: ["India", "USA", "UK"], required: false },
-  { label: "Country Object", name: "countryObj", type: "select", options: [{ value: "IND", label: "India" }, { value: "USA", label: "United States of America" }, { value: "UK", label: "United Kingdom" }], required: false },
-  { label: "Bio", name: "bio", type: "textarea", required: false },
-  { label: "Hobbies", name: "hobbies", type: "checkboxGroup", options: ["Reading", "Sports", "Music", "Traveling"], required: false },
-  { 
-    label: "Skills", 
-    name: "skills", 
-    type: "checkboxGroup", 
-    options: ["React", "Node.js", "Python", "Java"], 
-    required: false,
-    style: { display: "flex", gap: "5px" }
-  },
-  { label: "Resume", name: "resume", type: "file", required: false },
-];
-
-const conditionalFormData = [
-  { label: "Are you happy?", name: "happy", type: "radio", options: ["Yes", "No"], required: true },
-  { 
-    label: "Describe why you are happy", 
-    name: "happyReason", 
-    type: "textarea", 
-    required: true,
-    condition: { logic: "AND", rules: [{ field: "happy", operator: "equals", value: "Yes" }] }
-  },
-  { 
-    label: "Describe why you are not happy", 
-    name: "unhappyReason", 
-    type: "textarea", 
-    required: true,
-    condition: { logic: "AND", rules: [{ field: "happy", operator: "equals", value: "No" }] }
-  },
-  { label: "Age", name: "age", type: "number", required: true },
-  {
-    label: "Adult Happy Thoughts",
-    name: "adultThoughts",
-    type: "textarea",
-    required: true,
-    condition: {
-      logic: "AND",
-      rules: [
-        { field: "happy", operator: "equals", value: "Yes" },
-        { field: "age", operator: "greaterThan", value: 18 }
-      ]
-    }
-  },
-  {
-    label: "Select Options",
-    name: "selectedOptions",
-    type: "checkboxGroup",
-    options: [
-      "Option 1",
-      "Option 2",
-      "Option 3",
-      "Option 4",
-      "Option 5",
-    ],
-    required: true,
-  },
-  {
-    label: "Please provide additional details",
-    name: "details",
-    type: "textarea",
-    condition: {
-      logic: "AND",
-      rules: [
-        {
-          field: "selectedOptions",
-          operator: "includes",
-          value: "Option 2",
-        },
-        {
-          field: "selectedOptions",
-          operator: "includes",
-          value: "Option 3",
-        },
-      ],
-    },
-  },
-  {
-    label: "Why did you choose Option 4?",
-    name: "option4Reason",
-    type: "text",
-    condition: {
-      logic: "AND",
-      rules: [
-        {
-          field: "selectedOptions",
-          operator: "includes",
-          value: "Option 4",
-        },
-      ],
-    },
-  },
-];
-
-const gridFormData = [
-  { label: "First Name", name: "firstName", type: "text", grid: { md: 6 }, required: true },
-  { label: "Last Name", name: "lastName", type: "text", grid: { md: 6 }, required: true },
-  { label: "Address", name: "address", type: "textarea", grid: { md: 12, xs: 12 } },
-  { label: "Email", name: "email", type: "email", grid: { md: 12, xs: 12 }, required: true },
-  { label: "City", name: "city", type: "text", grid: { md: 4 } },
-  { label: "State", name: "state", type: "text", grid: { md: 4 } },
-  { label: "Country", name: "country", type: "text", grid: { md: 4 } }
-];
-
-const gridConditionalFormData = [
-  { label: "Employment Status", name: "employed", type: "radio", options: ["Yes", "No"], grid: { md: 6 }, required: true },
-  { 
-    label: "Company Name", 
-    name: "companyName", 
-    type: "text", 
-    grid: { md: 6 },
-    condition: { logic: "AND", rules: [{ field: "employed", operator: "equals", value: "Yes" }] },
-    required: true
-  },
-  {
-    label: "Select Options",
-    name: "selectedOptions",
-    type: "checkboxGroup",
-    options: ["Option 1", "Option 2", "Option 3"],
-    grid: { md: 12 },
-    required: false,
-  },
-  {
-    label: "Please provide additional details",
-    name: "details",
-    type: "textarea",
-    grid: { md: 12 },
-    condition: {
-      logic: "AND",
-      rules: [
-        { field: "selectedOptions", operator: "includes", value: "Option 2" },
-        { field: "selectedOptions", operator: "includes", value: "Option 3" },
-      ],
-    },
-  }
-];
+*Last updated: 2026-06-07 | Conversation ID: 4ddd5026-0619-49e8-a7d4-050fe03c9595*

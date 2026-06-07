@@ -1,7 +1,7 @@
 import './SelectField.css';
 import { BaseField } from '../BaseField';
 
-export function SelectField({ label, required, errorMessage, value, onChange, options, formStyles = {}, className, style, labelStyle, labelGap }) {
+export function SelectField({ label, required, errorMessage, value, onChange, options, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
   return (
     <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       <select
@@ -9,6 +9,7 @@ export function SelectField({ label, required, errorMessage, value, onChange, op
         value={value}
         onChange={onChange}
         required={required}
+        disabled={disabled}
         style={{ ...(formStyles.input || {}), ...(style || {}) }}
       >
         <option value="" disabled>Select an option</option>
@@ -21,3 +22,4 @@ export function SelectField({ label, required, errorMessage, value, onChange, op
     </BaseField>
   );
 }
+
