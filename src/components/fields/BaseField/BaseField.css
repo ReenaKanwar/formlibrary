@@ -23,3 +23,13 @@
   margin-top: 2px;
   text-align: left;
 }
+
+/* Disabled field controls */
+.base-field input:disabled,
+.base-field select:disabled,
+.base-field textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+

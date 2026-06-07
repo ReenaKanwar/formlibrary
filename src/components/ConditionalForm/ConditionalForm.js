@@ -1,10 +1,11 @@
-import './Form.css';
+import './ConditionalForm.css';
 import { fieldMapper } from '../../utils/fieldMapper';
 import { useState } from 'react';
+import { evaluateCondition } from '../../utils/conditionEvaluator';
 import { normalizeGrid } from '../../utils/normalizeGrid';
 import { resolveInitialValue } from '../../utils/resolveInitialValue';
 
-export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialValues, buttons, buttonContainerClassName, buttonContainerStyle }) {
+export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}, initialValues, buttons, buttonContainerClassName, buttonContainerStyle }) {
     const [values, setValues] = useState(() => {
         const initial = {};
         data.forEach((field) => {
@@ -34,6 +35,12 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
         }
     };
 
+    // Pre-calculate visible fields based on the condition evaluating to true.
+    const visibleFields = data.filter(field => {
+        if (!field.condition) return true;
+        return evaluateCondition(field.condition, values);
+    });
+
     const handleButtonClick = (e, btnConfig) => {
         e.preventDefault();
         const shouldValidate = btnConfig.validate !== undefined ? btnConfig.validate : btnConfig.type === 'submit';
@@ -42,7 +49,8 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
         const newErrors = {};
 
         if (shouldValidate) {
-            data.forEach((field) => {
+            // Only validate currently visible fields; skip disabled fields
+            visibleFields.forEach((field) => {
                 const key = field.name || field.label;
                 if (field.required && !field.disabled) {
                     const val = values[key];
@@ -60,12 +68,21 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
             }
         }
 
+        // Extract only the visible field values for the callback
+        const submittedValues = {};
+        visibleFields.forEach(field => {
+            const key = field.name || field.label;
+            if (values[key] !== undefined) {
+                submittedValues[key] = values[key];
+            }
+        });
+
         if (btnConfig.onClick) {
-            btnConfig.onClick(values);
+            btnConfig.onClick(submittedValues);
         }
 
         if (btnConfig.type === 'submit' && onSubmit) {
-            onSubmit(values);
+            onSubmit(submittedValues);
         }
     };
 
@@ -84,12 +101,12 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
     }
 
     return (
-        <form className="form-wrapper" onSubmit={handleFormSubmit} noValidate style={containerStyle}>
-            {data.map((field, index) => {
+        <form className="conditional-form-wrapper" onSubmit={handleFormSubmit} noValidate style={containerStyle}>
+            {visibleFields.map((field, index) => {
                 const FieldComponent = fieldMapper[field.type];
 
                 if (!FieldComponent) {
-                    console.warn(`Form: unknown field type "${field.type}"`);
+                    console.warn(`ConditionalForm: unknown field type "${field.type}"`);
                     return null;
                 }
 
@@ -124,12 +141,12 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
                 );
             })}
 
-            <div className={`form-submit-btn-wrapper ${buttonContainerClassName || ''}`.trim()} style={buttonContainerStyle || {}}>
+            <div className={`conditional-form-submit-btn-wrapper ${buttonContainerClassName || ''}`.trim()} style={buttonContainerStyle || {}}>
                 {(buttons || [{ id: 'submit', label: 'Submit', type: 'submit' }]).map((btn, idx) => (
                     <button
                         key={btn.id || idx}
                         type={btn.type === 'submit' ? 'submit' : 'button'}
-                        className={`form-submit-btn ${btn.className || ''}`.trim()}
+                        className={`conditional-form-submit-btn ${btn.className || ''}`.trim()}
                         style={btn.style || {}}
                         onClick={(e) => handleButtonClick(e, btn)}
                     >
