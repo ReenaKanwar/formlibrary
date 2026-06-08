@@ -530,11 +530,300 @@ function App() {
           buttonContainerStyle={{ display: "flex", gap: "12px", justifyContent: "space-between", marginTop: "12px" }}
         />
       </div>
+      {/* ─── Task 36 Examples ─────────────────────────────────────────── */}
+      <hr />
+      <h1>Task 36 — RepeatableGroup Field Type Support</h1>
+
+      {/* Example 1 — Basic Educational Qualifications (footer-right add, block-header-right remove) */}
+      <div>
+        <h2>Example 1 — Educational Qualifications (Basic)</h2>
+        <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+          Demonstrates core add/remove functionality, validation (required nested fields), and form submission structure.
+          minItems=1, maxItems=5. The Remove button is hidden when only 1 block remains.
+        </p>
+        <Form
+          data={[
+            {
+              label: "Educational Qualifications",
+              name: "education",
+              type: "repeatableGroup",
+              addButtonText: "Add Education",
+              minItems: 1,
+              maxItems: 5,
+              fields: [
+                { label: "University / Board", name: "university", type: "text", required: true },
+                { label: "Institute Name", name: "institute", type: "text", required: true },
+                { label: "Passing Year", name: "passingYear", type: "number", required: true },
+              ]
+            }
+          ]}
+          onSubmit={handleSubmit}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Example 2 — Grid Layout inside RepeatableGroup */}
+      <div>
+        <h2>Example 2 — Grid Layout Inside RepeatableGroup</h2>
+        <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+          Nested fields use <code>grid: {'{ md: 4 }'}</code>. On desktop: 3 columns side by side.
+          On mobile: stacked (xs defaults to 12 via normalizeGrid).
+        </p>
+        <Form
+          data={[
+            {
+              label: "Educational Qualifications",
+              name: "educationGrid",
+              type: "repeatableGroup",
+              addButtonText: "Add Education",
+              minItems: 1,
+              maxItems: 5,
+              fields: [
+                { label: "University / Board", name: "university", type: "text", required: true, grid: { md: 4 } },
+                { label: "Institute Name", name: "institute", type: "text", required: true, grid: { md: 4 } },
+                { label: "Passing Year", name: "passingYear", type: "number", required: true, grid: { md: 4 } },
+              ]
+            }
+          ]}
+          onSubmit={handleSubmit}
+          onChange={handleChange}
+          formStyles={{ grid: { columnGap: '16px', rowGap: '16px' } }}
+        />
+      </div>
+
+      {/* Example 3 — Conditional Rendering inside RepeatableGroup */}
+      <div>
+        <h2>Example 3 — Conditional Rendering Inside RepeatableGroup</h2>
+        <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+          "Degree Name" only appears when "Qualification Type" is set to "College". 
+          Condition is evaluated independently per block.
+        </p>
+        <Form
+          data={[
+            {
+              label: "Educational Qualifications",
+              name: "educationConditional",
+              type: "repeatableGroup",
+              addButtonText: "Add Qualification",
+              minItems: 1,
+              maxItems: 4,
+              fields: [
+                {
+                  label: "Qualification Type",
+                  name: "qualificationType",
+                  type: "select",
+                  options: ["School", "College"],
+                  required: true,
+                  grid: { md: 6 }
+                },
+                { label: "Institute Name", name: "institute", type: "text", required: true, grid: { md: 6 } },
+                {
+                  label: "Degree Name",
+                  name: "degreeName",
+                  type: "text",
+                  required: true,
+                  grid: { md: 6 },
+                  condition: {
+                    logic: "AND",
+                    rules: [{ field: "qualificationType", operator: "equals", value: "College" }]
+                  }
+                },
+                { label: "Passing Year", name: "passingYear", type: "number", required: true, grid: { md: 6 } },
+              ]
+            }
+          ]}
+          onSubmit={handleSubmit}
+          onChange={handleChange}
+          formStyles={{ grid: { columnGap: '16px', rowGap: '12px' } }}
+        />
+      </div>
+
+      {/* Example 4 — Initial Values prefill */}
+      <div>
+        <h2>Example 4 — Initial Values (Prefilled Blocks)</h2>
+        <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+          Two pre-populated education blocks are rendered from <code>initialValues</code>. 
+          Additional blocks can still be added.
+        </p>
+        <Form
+          data={[
+            {
+              label: "Educational Qualifications",
+              name: "education",
+              type: "repeatableGroup",
+              addButtonText: "Add Education",
+              minItems: 1,
+              maxItems: 5,
+              fields: [
+                { label: "University / Board", name: "university", type: "text", required: true },
+                { label: "Institute Name", name: "institute", type: "text", required: true },
+                { label: "Passing Year", name: "passingYear", type: "number", required: true },
+              ]
+            }
+          ]}
+          initialValues={{
+            education: [
+              { university: "CBSE", institute: "ABC School", passingYear: "2018" },
+              { university: "MAKAUT", institute: "XYZ College", passingYear: "2022" },
+            ]
+          }}
+          onSubmit={handleSubmit}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Example 5 — Disabled nested fields */}
+      <div>
+        <h2>Example 5 — Disabled Field Support</h2>
+        <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+          "University / Board" is <code>disabled: true</code> in each block — it shows its value but cannot be edited.
+        </p>
+        <Form
+          data={[
+            {
+              label: "Educational Qualifications",
+              name: "education",
+              type: "repeatableGroup",
+              addButtonText: "Add Education",
+              minItems: 1,
+              maxItems: 3,
+              fields: [
+                { label: "University / Board", name: "university", type: "text", required: true, disabled: true },
+                { label: "Institute Name", name: "institute", type: "text", required: true },
+                { label: "Passing Year", name: "passingYear", type: "number", required: true },
+              ]
+            }
+          ]}
+          initialValues={{
+            education: [
+              { university: "CBSE (Locked)", institute: "ABC School", passingYear: "2018" },
+            ]
+          }}
+          onSubmit={handleSubmit}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Example 6 — header-right Add Button */}
+      <div>
+        <h2>Example 6 — Add Control: header-right</h2>
+        <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+          The "Add" button is positioned in the <strong>header-right</strong> of the RepeatableGroup field.
+        </p>
+        <Form
+          data={[
+            {
+              label: "Work Experience",
+              name: "workExp",
+              type: "repeatableGroup",
+              minItems: 1,
+              maxItems: 5,
+              addControl: { type: "button", label: "+ Add Experience", position: "header-left" },
+              removeControl: { type: "button", label: "Remove", position: "block-footer-right" },
+              fields: [
+                { label: "Company", name: "company", type: "text", required: true, grid: { md: 6 } },
+                { label: "Role", name: "role", type: "text", required: true, grid: { md: 6 } },
+                { label: "Duration (Years)", name: "duration", type: "number", required: true, grid: { md: 6 } },
+              ]
+            }
+          ]}
+          onSubmit={handleSubmit}
+          onChange={handleChange}
+          formStyles={{ grid: { columnGap: '16px', rowGap: '12px' } }}
+        />
+      </div>
+
+      {/* Example 7 — footer-right Add Button */}
+      <div>
+        <h2>Example 7 — Add Control: footer-right (default)</h2>
+        <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+          The "Add" button is positioned in the <strong>footer-right</strong> (this is the default position).
+        </p>
+        <Form
+          data={[
+            {
+              label: "Certifications",
+              name: "certifications",
+              type: "repeatableGroup",
+              minItems: 1,
+              maxItems: 10,
+              addControl: { type: "button", label: "Add Certification", position: "footer-right" },
+              removeControl: { type: "icon-with-text", label: "Remove", position: "block-header-right" },
+              fields: [
+                { label: "Certification Name", name: "certName", type: "text", required: true, grid: { md: 8 } },
+                { label: "Year", name: "certYear", type: "number", required: true, grid: { md: 4 } },
+              ]
+            }
+          ]}
+          onSubmit={handleSubmit}
+          onChange={handleChange}
+          formStyles={{ grid: { columnGap: '16px', rowGap: '12px' } }}
+        />
+      </div>
+
+      {/* Example 8 — icon-only Add Control */}
+      <div>
+        <h2>Example 8 — Add Control: icon-only (+)</h2>
+        <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+          The Add control uses <code>type: "icon"</code> — renders as a circular "+" button at footer-right.
+        </p>
+        <Form
+          data={[
+            {
+              label: "Previous Addresses",
+              name: "addresses",
+              type: "repeatableGroup",
+              minItems: 1,
+              maxItems: 5,
+              addControl: { type: "icon", position: "footer-right" },
+              removeControl: { type: "icon", position: "block-header-right" },
+              fields: [
+                { label: "Street", name: "street", type: "text", required: true },
+                { label: "City", name: "city", type: "text", required: true, grid: { md: 6 } },
+                { label: "Pincode", name: "pincode", type: "text", required: true, grid: { md: 6 } },
+              ]
+            }
+          ]}
+          onSubmit={handleSubmit}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Example 9 — icon-with-text Add Control */}
+      <div>
+        <h2>Example 9 — Add Control: icon-with-text</h2>
+        <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+          The Add control uses <code>type: "icon-with-text"</code> — renders "+" icon alongside the label text.
+        </p>
+        <Form
+          data={[
+            {
+              label: "Family Members",
+              name: "family",
+              type: "repeatableGroup",
+              minItems: 1,
+              maxItems: 10,
+              addControl: { type: "icon-with-text", label: "Add Member", position: "footer-center" },
+              removeControl: { type: "icon-with-text", label: "Remove", position: "block-header-right" },
+              fields: [
+                { label: "Name", name: "name", type: "text", required: true, grid: { md: 6 } },
+                { label: "Relation", name: "relation", type: "select", options: ["Parent", "Sibling", "Spouse", "Child"], required: true, grid: { md: 6 } },
+                { label: "Age", name: "age", type: "number", required: false, grid: { md: 6 } },
+              ]
+            }
+          ]}
+          onSubmit={handleSubmit}
+          onChange={handleChange}
+          formStyles={{ grid: { columnGap: '16px', rowGap: '12px' } }}
+        />
+      </div>
+
     </div>
   );
 }
 
 export default App;
+
 ```
 
 ## Props Table (`Button`)
