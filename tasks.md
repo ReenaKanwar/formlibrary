@@ -2274,6 +2274,187 @@ Update `my-ui-test-app` to include examples verifying this functionality:
 
 ---
 
+## Task 36 - Add RepeatableGroup Field Type Support
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Depends On:** Task 35
+
+**Description:**
+Add support for a new field type: `repeatableGroup`. This field type allows users to dynamically add and remove groups of fields.
+
+The feature must be supported in both `Form` and `ConditionalForm`.
+
+### Feature Specifications:
+
+#### 1. Basic Usage & Expected Behavior
+Renders initial fields and an add button. Clicking the add button adds a new group/block of fields.
+Example structure:
+```js
+{
+  label: "Educational Qualifications",
+  name: "education",
+  type: "repeatableGroup",
+  addButtonText: "Add Education",
+  fields: [
+    {
+      label: "University / Board",
+      name: "university",
+      type: "text",
+      required: true
+    },
+    {
+      label: "Institute Name",
+      name: "institute",
+      type: "text",
+      required: true
+    },
+    {
+      label: "Passing Year",
+      name: "passingYear",
+      type: "number",
+      required: true
+    }
+  ]
+}
+```
+
+#### 2. Data Structure Requirement
+Submitted form data should return repeated group fields under the repeatableGroup `name` as an array of objects:
+```js
+{
+  education: [
+    {
+      university: "CBSE",
+      institute: "ABC School",
+      passingYear: "2018"
+    },
+    {
+      university: "MAKAUT",
+      institute: "XYZ College",
+      passingYear: "2022"
+    }
+  ]
+}
+```
+The library should internally manage the repeated field instances.
+
+#### 3. Remove Entry Support
+Each repeated block should support removal. Users should be able to remove any block (e.g. rendering a "Remove" button or icon for each block).
+Example:
+```text
+Education 1                         [Remove]
+
+University / Board
+Institute Name
+Passing Year
+```
+
+#### 4. Minimum and Maximum Entries
+Support:
+- `minItems`: prevent removing below `minItems` (default should be respected if provided, e.g., `minItems: 1`).
+- `maxItems`: prevent adding beyond `maxItems` (e.g., `maxItems: 10`).
+Show appropriate validation messages when limits are reached or when trying to violate the bounds.
+
+#### 5. Grid Support
+Nested fields inside `repeatableGroup` must support the existing responsive 12-column grid layout and normalization fallback logic.
+Example nested field configuration:
+```js
+fields: [
+  {
+    label: "University",
+    name: "university",
+    type: "text",
+    grid: { md: 4 }
+  },
+  ...
+]
+```
+
+#### 6. Conditional Rendering Support
+Conditional rendering must work inside repeatable groups. Rule evaluation must happen independently inside each repeated block based on its local block values.
+
+#### 7. Initial Values Support
+Support prefilling repeatableGroup fields from the form-level `initialValues` prop (e.g., `initialValues: { education: [ ... ] }`). The form should render the corresponding blocks automatically.
+
+#### 8. Disabled Field Support
+Nested fields inside repeatableGroup must respect the field-level `disabled: true` property and existing disabled behavior.
+
+#### 9. Add Control Customization
+Add support for configurable add controls:
+```js
+addControl: {
+  type: "button", // "button" | "icon" | "icon-with-text"
+  label: "Add Education",
+  position: "footer-right", // "header-left" | "header-right" | "footer-left" | "footer-right" | "footer-center"
+  className: "add-btn",
+  style: {}
+}
+```
+
+#### 10. Remove Control Customization
+Add support for configurable remove controls:
+```js
+removeControl: {
+  type: "icon-with-text", // "button" | "icon" | "icon-with-text"
+  label: "Remove",
+  position: "block-header-right", // position configuration
+  className: "remove-btn",
+  style: {}
+}
+```
+
+#### 11. Custom Styling and ClassNames
+Allow users to customize appearance without changing functionality by passing `className` and `style` within `addControl` and `removeControl` configurations.
+
+### Architecture Requirements:
+- Create a dedicated reusable `RepeatableGroup` component.
+- This must be implemented as a field type and NOT as a new form component (i.e., do not create `RepeatableForm`, etc.).
+- The feature must integrate into the existing dynamic field rendering system (e.g., mapped via `fieldMapper` and managed within the form's state).
+
+### Test Application Requirements:
+Update `my-test-ui-app` with a complete RepeatableGroup example (e.g., Educational Qualifications: University/Board, Institute Name, Passing Year) and verify:
+1. Add entry functionality
+2. Remove entry functionality
+3. minItems behavior
+4. maxItems behavior
+5. Grid layout support
+6. Validation support
+7. Conditional rendering support
+8. Initial values support
+9. Disabled field support
+10. Add control positions
+11. Remove control positions
+12. Form submission structure
+
+Add separate examples showing:
+- header-right add button
+- footer-right add button
+- icon-only add control
+- icon-with-text add control
+
+---
+
+### Steps:
+- [x] Create `RepeatableGroup` field component files (`RepeatableGroup.js`, `RepeatableGroup.css`, `index.js`).
+- [x] Register `repeatableGroup` field type in `fieldMapper.js` and export it from the library index.
+- [x] Implement group instance state management and data output serialization in `Form` and `ConditionalForm`.
+- [x] Implement `minItems` and `maxItems` boundaries and validation messages.
+- [x] Integrate grid support and conditional evaluation context updates to resolve conditions per-group.
+- [x] Add `addControl` and `removeControl` layout configuration and custom styling options.
+- [x] Update `my-test-ui-app` with the complete integration demo covering all 12 validation points.
+
+### Output Criteria:
+- [x] `repeatableGroup` is registered as a standard field type supported in both `<Form />` and `<ConditionalForm />`.
+- [x] Data structure maps nested inputs correctly under the repeatable group key name on submit.
+- [x] Add and remove buttons/icons render at configured positions with user styles.
+- [x] Grid, validations, conditional visibility, disabled status, and initial values all work correctly in nested blocks.
+- [x] No regressions to existing form components or single-field operations.
+- [x] Test application includes interactive validation demos.
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -2313,6 +2494,8 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
                                                                 └── Task 32 (Add Responsive Grid Layout Support)
                                                                      └── Task 33 (Default Grid Fallback Support)
                                                                           └── Task 34 (Initial Values & Disabled Field Support) [Done]
+                                                                               └── Task 35 (Custom Button System Support) [Done]
+                                                                                    └── Task 36 (RepeatableGroup Field Type Support)
 ```
 
 ---
@@ -2332,4 +2515,4 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
 
 ---
 
-*Last updated: 2026-06-07 | Conversation ID: 4ddd5026-0619-49e8-a7d4-050fe03c9595*
+*Last updated: 2026-06-08 | Conversation ID: 6d11314a-5f8a-4ff2-872e-2d1cab1bd633*

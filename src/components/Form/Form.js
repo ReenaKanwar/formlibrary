@@ -3,26 +3,44 @@ import { fieldMapper } from '../../utils/fieldMapper';
 import { useState } from 'react';
 import { normalizeGrid } from '../../utils/normalizeGrid';
 import { resolveInitialValue } from '../../utils/resolveInitialValue';
+import { evaluateCondition } from '../../utils/conditionEvaluator';
 
 export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialValues, buttons, buttonContainerClassName, buttonContainerStyle }) {
     const [values, setValues] = useState(() => {
         const initial = {};
         data.forEach((field) => {
             const key = field.name || field.label;
-            initial[key] = resolveInitialValue(field, initialValues);
+            if (field.type === 'repeatableGroup') {
+                // Prefill with initialValues array, else start with one empty block (or minItems blocks)
+                const minItems = field.minItems || 0;
+                const initVal = (initialValues && initialValues[key]) ? initialValues[key] : [];
+                const padded = [...initVal];
+                while (padded.length < minItems) padded.push({});
+                initial[key] = padded.length > 0 ? padded : [{}];
+            } else {
+                initial[key] = resolveInitialValue(field, initialValues);
+            }
         });
         return initial;
     });
     const [errors, setErrors] = useState({});
 
     const handleChange = (field, e) => {
-        const value = field.type === 'checkbox' ? e.target.checked :
-            field.type === 'file' && e.target.files ? e.target.files[0] :
-                e.target.value;
-
         const key = field.name || field.label;
-        const nextValues = { ...values, [key]: value };
+        let value;
 
+        if (field.type === 'repeatableGroup') {
+            // e is the new array directly (passed from RepeatableGroup component)
+            value = e;
+        } else if (field.type === 'checkbox') {
+            value = e.target.checked;
+        } else if (field.type === 'file' && e.target.files) {
+            value = e.target.files[0];
+        } else {
+            value = e.target.value;
+        }
+
+        const nextValues = { ...values, [key]: value };
         setValues(nextValues);
 
         if (errors[key]) {
@@ -44,12 +62,48 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
         if (shouldValidate) {
             data.forEach((field) => {
                 const key = field.name || field.label;
-                if (field.required && !field.disabled) {
-                    const val = values[key];
-                    const isEmpty = val === undefined || val === null || val === "" || val === false || (Array.isArray(val) && val.length === 0);
-                    if (isEmpty) {
-                        newErrors[key] = field.errorMessage || "This is a required field.";
-                        hasErrors = true;
+                const val = values[key];
+
+                if (field.type === 'repeatableGroup') {
+                    const groupVals = Array.isArray(val) ? val : [];
+                    let hasGroupErrors = false;
+                    const groupErrors = {};
+
+                    (field.fields || []).forEach(() => {}); // intentional no-op, validation is per-block below
+
+                    groupVals.forEach((blockVal, index) => {
+                        let blockErrors = null;
+                        (field.fields || []).forEach(subField => {
+                            if (subField.condition && !evaluateCondition(subField.condition, blockVal)) {
+                                return;
+                            }
+                            if (subField.required && !subField.disabled && !field.disabled) {
+                                const subKey = subField.name || subField.label;
+                                const subVal = blockVal ? blockVal[subKey] : undefined;
+                                const isEmpty = subVal === undefined || subVal === null || subVal === "" || subVal === false || (Array.isArray(subVal) && subVal.length === 0);
+                                if (isEmpty) {
+                                    if (!blockErrors) blockErrors = {};
+                                    blockErrors[subKey] = subField.errorMessage || "This is a required field.";
+                                    hasErrors = true;
+                                    hasGroupErrors = true;
+                                }
+                            }
+                        });
+                        if (blockErrors) {
+                            groupErrors[index] = blockErrors;
+                        }
+                    });
+
+                    if (hasGroupErrors) {
+                        newErrors[key] = groupErrors;
+                    }
+                } else {
+                    if (field.required && !field.disabled) {
+                        const isEmpty = val === undefined || val === null || val === "" || val === false || (Array.isArray(val) && val.length === 0);
+                        if (isEmpty) {
+                            newErrors[key] = field.errorMessage || "This is a required field.";
+                            hasErrors = true;
+                        }
                     }
                 }
             });
@@ -109,6 +163,12 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
                             label={field.label}
                             required={field.required}
                             options={field.options}
+                            fields={field.fields}
+                            minItems={field.minItems}
+                            maxItems={field.maxItems}
+                            addButtonText={field.addButtonText}
+                            addControl={field.addControl}
+                            removeControl={field.removeControl}
                             value={values[key] !== undefined ? values[key] : ''}
                             checked={!!values[key]}
                             onChange={(e) => handleChange(field, e)}

@@ -12,4 +12,4 @@ export { TextAreaField } from './components/fields/TextAreaField';
 export { FileField }   from './components/fields/FileField';
 export { DateField }   from './components/fields/DateField';
 export { NumberField } from './components/fields/NumberField';
-
+export { RepeatableGroup } from './components/fields/RepeatableGroup';

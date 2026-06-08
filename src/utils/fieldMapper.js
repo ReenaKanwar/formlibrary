@@ -9,6 +9,7 @@ import { TextAreaField } from '../components/fields/TextAreaField';
 import { FileField }    from '../components/fields/FileField';
 import { DateField }    from '../components/fields/DateField';
 import { NumberField }  from '../components/fields/NumberField';
+import { RepeatableGroup } from '../components/fields/RepeatableGroup';
 
 export const fieldMapper = {
   text:     TextField,
@@ -22,4 +23,5 @@ export const fieldMapper = {
   file:     FileField,
   date:     DateField,
   number:   NumberField,
+  repeatableGroup: RepeatableGroup,
 };

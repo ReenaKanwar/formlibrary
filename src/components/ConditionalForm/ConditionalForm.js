@@ -10,20 +10,35 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
         const initial = {};
         data.forEach((field) => {
             const key = field.name || field.label;
-            initial[key] = resolveInitialValue(field, initialValues);
+            if (field.type === 'repeatableGroup') {
+                const minItems = field.minItems || 0;
+                const initVal = (initialValues && initialValues[key]) ? initialValues[key] : [];
+                const padded = [...initVal];
+                while (padded.length < minItems) padded.push({});
+                initial[key] = padded.length > 0 ? padded : [{}];
+            } else {
+                initial[key] = resolveInitialValue(field, initialValues);
+            }
         });
         return initial;
     });
     const [errors, setErrors] = useState({});
 
     const handleChange = (field, e) => {
-        const value = field.type === 'checkbox' ? e.target.checked :
-            field.type === 'file' && e.target.files ? e.target.files[0] :
-                e.target.value;
-
         const key = field.name || field.label;
-        const nextValues = { ...values, [key]: value };
+        let value;
 
+        if (field.type === 'repeatableGroup') {
+            value = e;
+        } else if (field.type === 'checkbox') {
+            value = e.target.checked;
+        } else if (field.type === 'file' && e.target.files) {
+            value = e.target.files[0];
+        } else {
+            value = e.target.value;
+        }
+
+        const nextValues = { ...values, [key]: value };
         setValues(nextValues);
 
         if (errors[key]) {
@@ -35,7 +50,7 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
         }
     };
 
-    // Pre-calculate visible fields based on the condition evaluating to true.
+    // Pre-calculate visible fields based on condition evaluation
     const visibleFields = data.filter(field => {
         if (!field.condition) return true;
         return evaluateCondition(field.condition, values);
@@ -49,15 +64,49 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
         const newErrors = {};
 
         if (shouldValidate) {
-            // Only validate currently visible fields; skip disabled fields
+            // Only validate currently visible fields
             visibleFields.forEach((field) => {
                 const key = field.name || field.label;
-                if (field.required && !field.disabled) {
-                    const val = values[key];
-                    const isEmpty = val === undefined || val === null || val === "" || val === false || (Array.isArray(val) && val.length === 0);
-                    if (isEmpty) {
-                        newErrors[key] = field.errorMessage || "This is a required field.";
-                        hasErrors = true;
+                const val = values[key];
+
+                if (field.type === 'repeatableGroup') {
+                    const groupVals = Array.isArray(val) ? val : [];
+                    let hasGroupErrors = false;
+                    const groupErrors = {};
+
+                    groupVals.forEach((blockVal, index) => {
+                        let blockErrors = null;
+                        (field.fields || []).forEach(subField => {
+                            if (subField.condition && !evaluateCondition(subField.condition, blockVal)) {
+                                return;
+                            }
+                            if (subField.required && !subField.disabled && !field.disabled) {
+                                const subKey = subField.name || subField.label;
+                                const subVal = blockVal ? blockVal[subKey] : undefined;
+                                const isEmpty = subVal === undefined || subVal === null || subVal === "" || subVal === false || (Array.isArray(subVal) && subVal.length === 0);
+                                if (isEmpty) {
+                                    if (!blockErrors) blockErrors = {};
+                                    blockErrors[subKey] = subField.errorMessage || "This is a required field.";
+                                    hasErrors = true;
+                                    hasGroupErrors = true;
+                                }
+                            }
+                        });
+                        if (blockErrors) {
+                            groupErrors[index] = blockErrors;
+                        }
+                    });
+
+                    if (hasGroupErrors) {
+                        newErrors[key] = groupErrors;
+                    }
+                } else {
+                    if (field.required && !field.disabled) {
+                        const isEmpty = val === undefined || val === null || val === "" || val === false || (Array.isArray(val) && val.length === 0);
+                        if (isEmpty) {
+                            newErrors[key] = field.errorMessage || "This is a required field.";
+                            hasErrors = true;
+                        }
                     }
                 }
             });
@@ -126,6 +175,12 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
                             label={field.label}
                             required={field.required}
                             options={field.options}
+                            fields={field.fields}
+                            minItems={field.minItems}
+                            maxItems={field.maxItems}
+                            addButtonText={field.addButtonText}
+                            addControl={field.addControl}
+                            removeControl={field.removeControl}
                             value={values[key] !== undefined ? values[key] : ''}
                             checked={!!values[key]}
                             onChange={(e) => handleChange(field, e)}

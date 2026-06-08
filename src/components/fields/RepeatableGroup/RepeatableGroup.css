@@ -1,0 +1,177 @@
+/* ─────────────────────────────────────────────────────────────
+   RepeatableGroup — outer wrapper
+───────────────────────────────────────────────────────────── */
+.repeatable-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Add-control area — full-width flex row with alignment class
+   .repeatable-group__add-area--left   → justify-content: flex-start
+   .repeatable-group__add-area--right  → justify-content: flex-end
+   .repeatable-group__add-area--center → justify-content: center
+───────────────────────────────────────────────────────────── */
+.repeatable-group__add-area {
+  display: flex;
+  width: 100%;
+}
+.repeatable-group__add-area--left   { justify-content: flex-start; }
+.repeatable-group__add-area--right  { justify-content: flex-end;   }
+.repeatable-group__add-area--center { justify-content: center;     }
+
+/* ─────────────────────────────────────────────────────────────
+   Block list
+───────────────────────────────────────────────────────────── */
+.repeatable-group__items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Individual block
+───────────────────────────────────────────────────────────── */
+.repeatable-group__block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f9fafb;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Block header — title + remove button
+   --remove-right : title left, remove right  (justify: space-between)
+   --remove-left  : remove left, title right  (reverse DOM order, gap)
+───────────────────────────────────────────────────────────── */
+.repeatable-group__block-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.repeatable-group__block-header--remove-right {
+  justify-content: space-between;
+}
+
+.repeatable-group__block-header--remove-left {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.repeatable-group__block-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Add button variants
+───────────────────────────────────────────────────────────── */
+.repeatable-group__add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #c7d2fe;
+  background-color: #e0e7ff;
+  color: #4338ca;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.repeatable-group__add-btn:hover:not(:disabled) {
+  background-color: #c7d2fe;
+  border-color: #a5b4fc;
+}
+
+/* icon-only circular add */
+.repeatable-group__add-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #c7d2fe;
+  background-color: #e0e7ff;
+  color: #4338ca;
+  transition: background-color 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+.repeatable-group__add-icon:hover:not(:disabled) {
+  background-color: #c7d2fe;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Remove button variants
+───────────────────────────────────────────────────────────── */
+.repeatable-group__remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #fecaca;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  transition: background-color 0.2s;
+}
+.repeatable-group__remove-btn:hover:not(:disabled) {
+  background-color: #fecaca;
+}
+
+/* icon-only circular remove */
+.repeatable-group__remove-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #fecaca;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  transition: background-color 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+.repeatable-group__remove-icon:hover:not(:disabled) {
+  background-color: #fecaca;
+}
+
+/* shared icon span inside icon-with-text buttons */
+.repeatable-group__icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Disabled state
+───────────────────────────────────────────────────────────── */
+.repeatable-group__add-btn:disabled,
+.repeatable-group__add-icon:disabled,
+.repeatable-group__remove-btn:disabled,
+.repeatable-group__remove-icon:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
