@@ -100,7 +100,31 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
                     if (hasGroupErrors) {
                         newErrors[key] = groupErrors;
                     }
-                } else {
+                } else if (field.type === 'number') {
+                    if (field.required && !field.disabled && (val === undefined || val === null || val === "")) {
+                        newErrors[key] = field.errorMessage || "This is a required field.";
+                        hasErrors = true;
+                    } else if (val !== undefined && val !== null && val !== "") {
+                        const strVal = String(val);
+                        if (field.precision !== undefined) {
+                            const parts = strVal.split('.');
+                            if (field.precision === 0 && parts.length > 1) {
+                                newErrors[key] = field.errorMessage || "Only whole numbers are allowed.";
+                                hasErrors = true;
+                            } else if (parts.length > 1 && parts[1].length > field.precision) {
+                                newErrors[key] = field.errorMessage || `Maximum ${field.precision} decimal places allowed.`;
+                                hasErrors = true;
+                            }
+                        }
+                        if (!newErrors[key] && field.maxDigits !== undefined) {
+                            const digitCount = strVal.replace(/[^0-9]/g, '').length;
+                            if (digitCount > field.maxDigits) {
+                                newErrors[key] = field.errorMessage || `Maximum ${field.maxDigits} digits allowed.`;
+                                hasErrors = true;
+                            }
+                        }
+                    }
+                } else if (field.type !== 'content') {
                     if (field.required && !field.disabled) {
                         const isEmpty = val === undefined || val === null || val === "" || val === false || (Array.isArray(val) && val.length === 0);
                         if (isEmpty) {
@@ -181,6 +205,15 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
                             addButtonText={field.addButtonText}
                             addControl={field.addControl}
                             removeControl={field.removeControl}
+                            variant={field.variant}
+                            content={field.content}
+                            textAlign={field.textAlign}
+                            maxDigits={field.maxDigits}
+                            precision={field.precision}
+                            prefix={field.prefix}
+                            suffix={field.suffix}
+                            prefixStyle={field.prefixStyle}
+                            suffixStyle={field.suffixStyle}
                             value={values[key] !== undefined ? values[key] : ''}
                             checked={!!values[key]}
                             onChange={(e) => handleChange(field, e)}

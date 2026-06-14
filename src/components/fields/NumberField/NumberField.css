@@ -12,3 +12,63 @@
 .number-field__input:focus {
   border-color: #4f46e5;
 }
+
+.prefix-suffix-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: border-color 0.2s ease;
+  overflow: hidden;
+}
+
+.prefix-suffix-wrapper:focus-within {
+  border-color: #4f46e5;
+}
+
+.prefix-suffix-wrapper.is-disabled {
+  background-color: #f9fafb;
+}
+
+.prefix-suffix-wrapper .inner-input {
+  flex: 1;
+  min-width: 0;
+  border: none !important;
+  outline: none;
+  box-shadow: none;
+  padding: 10px 0;
+  background: transparent;
+  font-size: 14px;
+}
+
+.prefix-suffix-wrapper.is-disabled .inner-input {
+  cursor: not-allowed;
+  color: #9ca3af;
+}
+
+.prefix-suffix-wrapper:not(.has-prefix) .inner-input {
+  padding-left: 12px;
+}
+
+.prefix-suffix-wrapper:not(.has-suffix) .inner-input {
+  padding-right: 12px;
+}
+
+.field-prefix {
+  font-size: 14px;
+  color: #6b7280;
+  white-space: nowrap;
+  padding: 10px 8px 10px 12px;
+  user-select: none;
+}
+
+.field-suffix {
+  font-size: 14px;
+  color: #6b7280;
+  white-space: nowrap;
+  padding: 10px 12px 10px 8px;
+  user-select: none;
+}

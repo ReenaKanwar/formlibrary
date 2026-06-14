@@ -2455,6 +2455,198 @@ Add separate examples showing:
 
 ---
 
+### Task 37 — Add Content Field Type Support
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Description:**
+Create a new field type named `content`. The content field should allow users to render static or conditional content inside both `Form` and `ConditionalForm`.
+
+**Use Cases:**
+- Section headings
+- Sub-headings
+- Informational text
+- Instructions
+- Warnings
+- Conditional messages
+- HTML content (future-ready support)
+
+**Examples:**
+```json
+{
+  "type": "content",
+  "variant": "heading",
+  "content": "Personal Information"
+}
+```
+```json
+{
+  "type": "content",
+  "variant": "text",
+  "content": "Please fill all required fields."
+}
+```
+```json
+{
+  "type": "content",
+  "content": "Welcome",
+  "textAlign": "center"
+}
+```
+
+**Requirements:**
+- Support in Form
+- Support in ConditionalForm
+- Support conditional rendering using existing condition engine
+- Support grid layout
+- Support className
+- Support inline style
+- Support disabled condition evaluation logic (content should still render when condition is satisfied)
+- Support variants: `heading`, `subHeading`, `text`
+- Alignment Support: `left`, `center`, `right`
+
+**Global Styling Support:**
+Extend formStyles:
+```jsx
+formStyles={{
+  content: {},
+  contentHeading: {},
+  contentSubHeading: {},
+  contentText: {},
+  contentGap: "16px"
+}}
+```
+
+**Style Priority:**
+Library Default Styles → `formStyles` Variant Styles → `field.style`
+Field-level styles must override global styles.
+
+**Steps:**
+- [x] Create `ContentField` component.
+- [x] Implement support for `heading`, `subHeading`, and `text` variants.
+- [x] Add alignment support (`left`, `center`, `right`).
+- [x] Integrate styling priority (Library Defaults -> Global `formStyles` -> Field-level `style`).
+- [x] Register `content` field type in `fieldMapper.js` and ensure it works in both `<Form />` and `<ConditionalForm />`.
+- [x] Support conditional rendering using the existing condition engine.
+- [x] Support grid layout and `className`.
+
+**Output Criteria:**
+- [x] `content` field type renders properly in Form and ConditionalForm.
+- [x] Styling follows the correct priority and aligns text as requested.
+- [x] Content fields render correctly when conditions are satisfied, even if disabled condition evaluation logic exists.
+- [x] Test application includes examples for all 3 variants, 3 alignments, conditional rendering, grid usage, and global/field-level styling.
+
+---
+
+### Task 38 — Enhance Number Field Validation & Restrictions
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Description:**
+Add advanced validation options for `NumberField` supporting maximum digits, decimal precision, and integer-only mode.
+
+**Support & Examples:**
+- Maximum Digits: 
+```json
+{ "label": "Passing Year", "name": "passingYear", "type": "number", "maxDigits": 4 }
+```
+Should prevent values longer than 4 digits.
+- Decimal Precision: 
+```json
+{ "label": "Amount", "name": "amount", "type": "number", "precision": 2 }
+```
+(Valid: 100.25, Invalid: 100.256)
+- Integer-only Mode: 
+```json
+{ "type": "number", "precision": 0 }
+```
+Should only allow whole numbers.
+
+**Validation Requirements:**
+- Real-time validation
+- Submit validation
+- Existing error handling integration
+- Existing custom error message support
+- Existing required validation compatibility
+
+**Steps:**
+- [x] Update `NumberField.js` to accept `maxDigits` and `precision` properties.
+- [x] Implement real-time validation to restrict inputs visually when possible.
+- [x] Implement submit validation integrated with existing error handling and custom error messages.
+- [x] Ensure compatibility with existing required validation.
+
+**Output Criteria:**
+- [x] Users cannot enter values exceeding `maxDigits`.
+- [x] `precision: 2` correctly limits decimal places, and `precision: 0` restricts input to whole numbers.
+- [x] Real-time and submit validations work flawlessly and show custom error messages.
+- [x] Test application includes examples for `maxDigits`, `precision 0`, `precision 2`, validation failures, and custom error messages.
+
+---
+
+### Task 39 — Add Prefix / Suffix Support for Text & Number Fields
+
+**Status:** `[x] Done`
+**Assignee:** Rajiv
+
+**Description:**
+Allow text and number fields to display static content before or after the input value. Supported Fields: `TextField`, `NumberField`.
+
+**Prefix/Suffix Examples:**
+```json
+{ "type": "number", "prefix": "$" }
+```
+Result: `$ [________]`
+```json
+{ "type": "number", "suffix": "%" }
+```
+Result: `[________] %`
+```json
+{ "type": "number", "prefix": "$", "suffix": "USD" }
+```
+
+**Styling Support:**
+Field Level:
+```json
+{
+  "prefixStyle": {},
+  "suffixStyle": {}
+}
+```
+Global Level:
+```jsx
+formStyles={{
+  prefix: {},
+  suffix: {}
+}}
+```
+
+**Requirements:**
+- Prefix/Suffix should always remain visible
+- User cannot edit prefix/suffix values
+- Input value should remain clean in submitted data
+- Validation should operate only on actual field value
+- Compatible with disabled fields
+- Compatible with grid system
+- Compatible with ConditionalForm
+- Compatible with existing field styling system
+
+**Steps:**
+- [ ] Update `TextField` and `NumberField` to accept `prefix`, `suffix`, `prefixStyle`, and `suffixStyle` props.
+- [ ] Update `formStyles` to accept global `prefix` and `suffix` styling.
+- [ ] Wrap the `input` inside a container that renders the prefix and/or suffix.
+- [ ] Ensure the prefix/suffix cannot be edited and do not pollute the actual submitted field value.
+- [ ] Make the changes compatible with disabled fields, grid system, ConditionalForm, and validation logic.
+
+**Output Criteria:**
+- [ ] Prefix and suffix remain visible and uneditable.
+- [ ] Submitted data is clean (only the input value).
+- [ ] Styling cascades correctly from global `formStyles` to field-level `prefixStyle`/`suffixStyle`.
+- [ ] Test application includes examples for dollar amounts, percentages, weights, currency with prefix/suffix, text with prefix, disabled fields, global styling usage, and inline styling usage.
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -2496,6 +2688,9 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
                                                                           └── Task 34 (Initial Values & Disabled Field Support) [Done]
                                                                                └── Task 35 (Custom Button System Support) [Done]
                                                                                     └── Task 36 (RepeatableGroup Field Type Support)
+                                                                                         └── Task 37 (Add Content Field Type Support)
+                                                                                              └── Task 38 (Enhance Number Field Validation & Restrictions)
+                                                                                                   └── Task 39 (Add Prefix / Suffix Support for Text & Number Fields)
 ```
 
 ---
