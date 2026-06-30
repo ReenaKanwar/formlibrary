@@ -2647,6 +2647,334 @@ formStyles={{
 
 ---
 
+### Task 40 — Add MultiSelect Field Support
+
+**Status:** `[x] Done`
+
+**Objective:**
+Create a new reusable field component:
+
+```text
+multiSelect
+```
+
+This field should allow users to select multiple values from a predefined list of options.
+
+The field should work in:
+* Form
+* ConditionalForm
+
+**Example:**
+```js
+{
+  label: "Skills",
+  name: "skills",
+  type: "multiSelect",
+
+  options: [
+    "React",
+    "JavaScript",
+    "Node.js"
+  ]
+}
+```
+
+**Expected UI behavior:**
+* User can open dropdown
+* User can select multiple options
+* Selected values should be displayed inside the field as tags/chips
+
+**Example:**
+```text
+Skills
+
+[React ×] [JavaScript ×]
+
+▼
+----------------
+React
+JavaScript
+Node.js
+----------------
+```
+
+**Submitted data should return:**
+```js
+{
+  skills: [
+    "React",
+    "JavaScript"
+  ]
+}
+```
+
+**Requirements:**
+* Support multiple selections
+* Support deselect/remove selected values
+* Support required validation
+* Support existing error handling
+* Support disabled state
+* Support initialValues
+
+**Example:**
+```js
+initialValues:{
+  skills:[
+    "React",
+    "Node.js"
+  ]
+}
+```
+
+**Search Support:**
+Add optional search functionality.
+
+Example:
+```js
+{
+ type:"multiSelect",
+
+ searchable:true
+}
+```
+User should be able to search inside available options.
+
+**Support maximum selection limit:**
+Example:
+```js
+{
+ type:"multiSelect",
+
+ maxSelection:3
+}
+```
+Prevent selecting more than the allowed number.
+
+**Options should support both:**
+Simple:
+```js
+[
+ "React",
+ "Angular"
+]
+```
+and object format:
+```js
+[
+ {
+   label:"React",
+   value:"react"
+ }
+]
+```
+
+**Styling Support:**
+Integrate with existing form styling system.
+
+Add support for:
+```js
+formStyles={{
+  dropdown:{},
+  option:{},
+  selectedOption:{},
+  tag:{}
+}}
+```
+
+Also support field level:
+```js
+{
+ className:"",
+ style:{}
+}
+```
+
+**Compatibility:**
+Must support:
+* Grid layout
+* Conditional rendering
+* Validation
+* Disabled fields
+* Initial values
+* Form submission
+
+**Test App Requirement:**
+Add examples in `my-test-ui-app` showing:
+* Basic multiSelect
+* Searchable multiSelect
+* Required multiSelect
+* Disabled multiSelect
+* maxSelection example
+* Initial values example
+* Custom styling example
+
+**General Architecture Requirement:**
+Create a reusable common base component for dropdown/select based fields.
+
+Example:
+```text
+components/
+ ├── SelectBase
+ ├── SelectField
+ ├── MultiSelectField
+ └── TypeAheadField
+```
+`SelectBase` should manage common functionality:
+- dropdown rendering
+- option list rendering
+- search handling
+- keyboard interaction
+- selection handling
+- loading state
+- empty state
+- common styling
+
+`MultiSelectField` and `TypeAheadField` should extend/reuse `SelectBase` instead of duplicating logic.
+Do not duplicate dropdown logic between fields. Maintain reusable architecture for future dropdown based components.
+
+---
+
+### Task 41 — Add TypeAhead Field Support
+
+**Status:** `[x] Done`
+
+**Objective:**
+Create a new reusable field component:
+
+```text
+typeAhead
+```
+
+This field should support searching and selecting values dynamically.
+
+The field should work in:
+* Form
+* ConditionalForm
+
+**Example:**
+```js
+{
+ label:"Company",
+ name:"company",
+ type:"typeAhead"
+}
+```
+
+**Expected behavior:**
+User types:
+```text
+mic
+```
+Dropdown should show:
+```text
+Microsoft
+Microsoft India
+Microsoft Azure
+```
+User can select one option.
+
+**Submitted data example:**
+```js
+{
+ company:"Microsoft"
+}
+```
+
+**Requirements:**
+* Support dynamic searching
+* Support async option loading
+* Support loading states
+* Support no-result state
+* Support selecting a suggestion
+* Support clearing selected value
+* Support disabled state
+* Support required validation
+* Support existing error handling
+* Support initialValues
+
+**API Design:**
+Support callback:
+```js
+{
+ type:"typeAhead",
+
+ loadOptions: async(searchValue)=>{
+
+   return [
+     {
+       label:"Microsoft",
+       value:"microsoft"
+     }
+   ]
+
+ }
+}
+```
+The component should call `loadOptions` when the user searches.
+
+**Support minimum search characters:**
+Example:
+```js
+{
+ type:"typeAhead",
+
+ minSearchLength:3
+}
+```
+Do not call API before the minimum characters are entered.
+
+**Options should support:**
+```js
+[
+ {
+   label:"",
+   value:""
+ }
+]
+```
+
+**Styling Support:**
+Integrate with existing formStyles.
+
+Support:
+```js
+formStyles={{
+ dropdown:{},
+ option:{},
+ selectedOption:{}
+}}
+```
+
+Support field level:
+```js
+{
+ className:"",
+ style:{}
+}
+```
+
+**Compatibility:**
+Must support:
+* Grid layout
+* Conditional rendering
+* Validation
+* Disabled fields
+* Initial values
+* Form submission
+
+**Test App Requirement:**
+Add examples in `my-test-ui-app` showing:
+* Static typeAhead example
+* Async search example
+* Loading state
+* No result state
+* Required validation
+* Disabled typeAhead
+* Conditional rendering example
+* Custom styling example
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -2691,6 +3019,8 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
                                                                                          └── Task 37 (Add Content Field Type Support)
                                                                                               └── Task 38 (Enhance Number Field Validation & Restrictions)
                                                                                                    └── Task 39 (Add Prefix / Suffix Support for Text & Number Fields)
+                                                                                                        └── Task 40 (Add MultiSelect Field Support)
+                                                                                                             └── Task 41 (Add TypeAhead Field Support)
 ```
 
 ---

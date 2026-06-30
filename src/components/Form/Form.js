@@ -212,6 +212,12 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
                             labelStyle={field.labelStyle}
                             labelGap={formStyles.labelGap}
                             disabled={!!field.disabled}
+                            searchable={field.searchable}
+                            maxSelection={field.maxSelection}
+                            loadOptions={field.loadOptions}
+                            minSearchLength={field.minSearchLength}
+                            isClearable={field.isClearable}
+                            placeholder={field.placeholder}
                         />
                     </div>
                 );

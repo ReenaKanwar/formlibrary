@@ -1,0 +1,188 @@
+/* ── Container ─────────────────────────────────────── */
+.select-base__container {
+  position: relative;
+  width: 100%;
+}
+
+/* ── Trigger (looks identical to text-field__input) ── */
+.select-base__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  cursor: pointer;
+  min-height: 42px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+  color: #111827;
+}
+
+.select-base__trigger:hover:not(.select-base--disabled .select-base__trigger) {
+  border-color: #9ca3af;
+}
+
+.select-base__trigger:focus-within {
+  border-color: #4f46e5;
+}
+
+.select-base--disabled .select-base__trigger {
+  background-color: #f9fafb;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ── Trigger content ─────────────────────────────── */
+.select-base__trigger-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+}
+
+.select-base__trigger-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select-base__placeholder {
+  color: #9ca3af;
+}
+
+/* ── TypeAhead: native input IS the trigger ────────── */
+.select-base__typeahead-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #111827;
+  padding: 0;
+  width: 100%;
+}
+
+.select-base__typeahead-input::placeholder {
+  color: #9ca3af;
+}
+
+.select-base--disabled .select-base__typeahead-input {
+  cursor: not-allowed;
+  color: #9ca3af;
+}
+
+/* ── Trigger actions (clear btn + arrow) ─────────── */
+.select-base__trigger-actions {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.select-base__clear-btn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+
+.select-base__clear-btn:hover {
+  color: #ef4444;
+}
+
+.select-base__arrow {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 2px;
+  user-select: none;
+}
+
+/* ── Dropdown panel ──────────────────────────────── */
+.select-base__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 250px;
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── In-dropdown search box ──────────────────────── */
+.select-base__search-wrapper {
+  padding: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.select-base__search-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.select-base__search-input:focus {
+  border-color: #4f46e5;
+}
+
+/* ── Options list ────────────────────────────────── */
+.select-base__options-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.select-base__option {
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.12s ease;
+}
+
+.select-base__option:hover {
+  background-color: #f3f4f6;
+}
+
+.select-base__option--selected {
+  background-color: #ede9fe;
+  color: #4f46e5;
+  font-weight: 500;
+}
+
+.select-base__option-checkbox {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.select-base__no-results,
+.select-base__loading {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
