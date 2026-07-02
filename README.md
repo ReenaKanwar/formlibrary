@@ -1,36 +1,28 @@
-# formLibrary
+# form-library
 
-A reusable, production-structured React component library built with Vite in library mode. 
-It currently exports a customizable `Button` component and is designed to be easily extensible.
+A reusable, production-structured React component library built with Vite in library mode.
+It currently exports customizable `Form` and `ConditionalForm` components and is designed to be easily extensible.
 
 ## Installation
 
-**Local Installation (File-based link):**
-In your consumer React app's `package.json`, add the following dependency pointing to the local directory:
-```json
-"dependencies": {
-  "formLibrary": "file:../formLibrary"
-}
-```
-Then run:
+**NPM:**
 ```bash
-npm install
+npm install form-library
 ```
 
-*(Future NPM Installation: `npm install formLibrary`)*
-
-## CSS Import
-
-To use the library's styles, you must import its compiled CSS file at the root of your React app (e.g., in `main.jsx` or `App.jsx`):
-```javascript
-import 'formLibrary/dist/style.css';
+**Yarn:**
+```bash
+yarn add form-library
 ```
+
+## Styling
+
+CSS is automatically injected when you import the components. There is no need to manually import a CSS file!
 
 ## Usage Example
 
 ```jsx
-import { Form, ConditionalForm } from 'formLibrary';
-import 'formLibrary/dist/style.css';
+import { Form, ConditionalForm } from 'form-library';
 
 const formData = [
   { label: "Full Name", name: "fullName", type: "text", required: true },
