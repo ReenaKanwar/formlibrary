@@ -11,6 +11,8 @@ import { DateField }    from '../components/fields/DateField';
 import { NumberField }  from '../components/fields/NumberField';
 import { RepeatableGroup } from '../components/fields/RepeatableGroup';
 import { ContentField } from '../components/fields/ContentField';
+import { MultiSelectField } from '../components/fields/MultiSelectField';
+import { TypeAheadField } from '../components/fields/TypeAheadField';
 
 export const fieldMapper = {
   text:     TextField,
@@ -26,4 +28,6 @@ export const fieldMapper = {
   number:   NumberField,
   repeatableGroup: RepeatableGroup,
   content:  ContentField,
+  multiSelect: MultiSelectField,
+  typeAhead: TypeAheadField,
 };
