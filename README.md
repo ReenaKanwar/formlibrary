@@ -838,10 +838,10 @@ npm run build
 ## Local Testing Walkthrough
 
 1. Scaffold a test app: `npx create-vite@latest my-ui-test-app --template react`
-2. Run `npm run build` inside this library (`formLibrary`).
-3. In `my-ui-test-app/package.json`, add `"formLibrary": "file:../formLibrary"` to `dependencies`.
+2. Run `npm run build` inside this library (`skemvora`).
+3. In `my-ui-test-app/package.json`, add `"skemvora": "file:../skemvora"` to `dependencies`.
 4. Run `npm install` in `my-ui-test-app/`.
-5. Import `Button` and `formLibrary/dist/style.css` in your test app's code.
+5. Import `Button` and `skemvora/dist/style.css` in your test app's code.
 6. Run `npm run dev` in the test app to verify it works in the browser.
 
 ## Contributing

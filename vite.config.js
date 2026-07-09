@@ -14,8 +14,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.js',
-      name: 'FormLibrary',
-      fileName: (format) => `formLibrary.${format}.js`,
+      name: 'skemvora',
+      fileName: (format) => `skemvora.${format}.js`,
       formats: ['es', 'umd']
     },
     rollupOptions: {

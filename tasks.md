@@ -1,6 +1,6 @@
 # 📦 React UI Component Library — Team Task Board
 
-> **Project Name:** `formLibrary`
+> **Project Name:** `skemvora`
 > **Goal:** Build a reusable, production-structured React component library using Vite in library mode, export a `Button` component, and verify it end-to-end in a companion test app.
 > **Workspace Root:** `C:\Users\Rajiv Kumar\Desktop\my\Lib\`
 
@@ -10,7 +10,7 @@
 
 ```
 Lib/
-├── formLibrary/          ← The component library (Phase 1 & 2)
+├── skemvora/          ← The component library (Phase 1 & 2)
 │   ├── src/
 │   │   ├── index.js                  ← Barrel export (exports all components)
 │   │   └── components/
@@ -39,29 +39,29 @@ Lib/
 
 ---
 
-### Task 1 — Initialize the Library Project (`formLibrary`)
+### Task 1 — Initialize the Library Project (`skemvora`)
 
 **Status:** `[x] Done`
 **Assignee:** Rajiv
 
 **Description:**
-Set up the `formLibrary` project from scratch inside `C:\Users\Rajiv Kumar\Desktop\my\Lib\formLibrary\`. This is the root library package — it does NOT use a scaffold tool; it is created manually.
+Set up the `skemvora` project from scratch inside `C:\Users\Rajiv Kumar\Desktop\my\Lib\skemvora\`. This is the root library package — it does NOT use a scaffold tool; it is created manually.
 
 **Steps:**
-1. Create the folder `formLibrary/` inside the workspace root (`Lib/`).
-2. Inside `formLibrary/`, create a `package.json` with the following configuration:
-   - `"name": "formLibrary"`
+1. Create the folder `skemvora/` inside the workspace root (`Lib/`).
+2. Inside `skemvora/`, create a `package.json` with the following configuration:
+   - `"name": "skemvora"`
    - `"version": "1.0.0"`
-   - `"main": "dist/formLibrary.umd.js"`
-   - `"module": "dist/formLibrary.es.js"`
+   - `"main": "dist/skemvora.umd.js"`
+   - `"module": "dist/skemvora.es.js"`
    - `"exports"` field pointing to both ES (`import`) and UMD (`require`) builds
    - `"peerDependencies"`: `react` and `react-dom` (both `^18.0.0`)
    - `"devDependencies"`: `react`, `react-dom`, `vite`, `@vitejs/plugin-react`
    - `"scripts"`: `"build": "vite build"`, `"dev": "vite"`
-3. Run `npm install` inside `formLibrary/` to install dev dependencies.
+3. Run `npm install` inside `skemvora/` to install dev dependencies.
 
 **Output Criteria:**
-- `formLibrary/package.json` exists and is valid JSON.
+- `skemvora/package.json` exists and is valid JSON.
 - `node_modules/` folder is created after `npm install`.
 
 ---
@@ -74,15 +74,15 @@ Set up the `formLibrary` project from scratch inside `C:\Users\Rajiv Kumar\Deskt
 **Depends On:** Task 1
 
 **Description:**
-Create `vite.config.js` inside `formLibrary/`. This configures Vite to build the project as a **library** (not a regular app), outputting ES and UMD bundles. This is the most critical config step.
+Create `vite.config.js` inside `skemvora/`. This configures Vite to build the project as a **library** (not a regular app), outputting ES and UMD bundles. This is the most critical config step.
 
 **Steps:**
-1. Create `formLibrary/vite.config.js` with the following settings:
+1. Create `skemvora/vite.config.js` with the following settings:
    - Import `{ defineConfig }` from `vite` and `react` from `@vitejs/plugin-react`.
    - Set `build.lib`:
      - `entry`: `src/index.js` (the barrel file)
      - `name`: `MyUILibrary` (UMD global name)
-     - `fileName`: `(format) => \`formLibrary.\${format}.js\``
+     - `fileName`: `(format) => \`skemvora.\${format}.js\``
      - `formats`: `['es', 'umd']`
    - Set `build.rollupOptions.external`: `['react', 'react-dom']` — **This is critical.** It prevents React from being bundled into the library so consumers use their own React instance.
    - Set `build.rollupOptions.output.globals`: `{ react: 'React', 'react-dom': 'ReactDOM' }`
@@ -90,7 +90,7 @@ Create `vite.config.js` inside `formLibrary/`. This configures Vite to build the
 
 **Output Criteria:**
 - `vite.config.js` exists.
-- Running `npm run build` in `formLibrary/` generates a `dist/` folder containing `.es.js`, `.umd.js`, and optionally `style.css`.
+- Running `npm run build` in `skemvora/` generates a `dist/` folder containing `.es.js`, `.umd.js`, and optionally `style.css`.
 
 ---
 
@@ -99,14 +99,11 @@ Create `vite.config.js` inside `formLibrary/`. This configures Vite to build the
 **Status:** `[x] Done`
 **Assignee:** Rajiv
 
-**Depends On:** Task 1
-
-**Description:**
-Create the library's central export file at `formLibrary/src/index.js`. This file aggregates and re-exports all components so consumers only need to import from `formLibrary`.
+Create the library's central export file at `skemvora/src/index.js`. This file aggregates and re-exports all components so consumers only need to import from `skemvora`.
 
 **Steps:**
-1. Create the folder structure: `formLibrary/src/`.
-2. Create `formLibrary/src/index.js` with the following content:
+1. Create the folder structure: `skemvora/src/`.
+2. Create `skemvora/src/index.js` with the following content:
    ```js
    export { Button } from './components/Button';
    ```
@@ -129,7 +126,7 @@ Create the library's central export file at `formLibrary/src/index.js`. This fil
 Create the core `Button` React component. It must be a pure, stateless UI component — no app-specific logic. It supports two visual variants via the `variant` prop.
 
 **Steps:**
-1. Create the folder: `formLibrary/src/components/Button/`.
+1. Create the folder: `skemvora/src/components/Button/`.
 2. Create `Button.js` as a **named export** functional component with the following props:
    - `label` (string) — The text displayed inside the button.
    - `onClick` (function) — Callback for click events.
@@ -174,10 +171,10 @@ export function Button({ label, onClick, variant = 'primary', className = '', st
 **Depends On:** Task 4
 
 **Description:**
-Create the CSS file for the `Button` component at `formLibrary/src/components/Button/Button.css`. Styles must be scoped using specific class names to avoid global leakage.
+Create the CSS file for the `Button` component at `skemvora/src/components/Button/Button.css`. Styles must be scoped using specific class names to avoid global leakage.
 
 **Steps:**
-1. Create `Button.css` inside `formLibrary/src/components/Button/`.
+1. Create `Button.css` inside `skemvora/src/components/Button/`.
 2. Import it at the top of `Button.jsx`: `import './Button.css';`
 3. Implement the following CSS rules:
 
@@ -223,7 +220,7 @@ Create the CSS file for the `Button` component at `formLibrary/src/components/Bu
 Create the `index.js` inside the `Button/` folder so that other files (like `src/index.js`) can import from the folder path `./components/Button` cleanly, without specifying the filename.
 
 **Steps:**
-1. Create `formLibrary/src/components/Button/index.js`.
+1. Create `skemvora/src/components/Button/index.js`.
 2. Add only this line:
    ```js
    export { Button } from './Button';
@@ -246,13 +243,13 @@ Create the `index.js` inside the `Button/` folder so that other files (like `src
 Run the Vite build to compile the library and verify the output artifacts are correct. This is the first integration validation step.
 
 **Steps:**
-1. Open a terminal in `formLibrary/`.
+1. Open a terminal in `skemvora/`.
 2. Run: `npm run build`
 3. Verify the `dist/` folder is created with:
-   - `formLibrary.es.js` — ES module bundle
-   - `formLibrary.umd.js` — UMD bundle (for CommonJS consumers)
+   - `skemvora.es.js` — ES module bundle
+   - `skemvora.umd.js` — UMD bundle (for CommonJS consumers)
    - `style.css` — Bundled CSS (if Vite extracts it separately)
-4. Open `formLibrary.es.js` and confirm:
+4. Open `skemvora.es.js` and confirm:
    - `react` and `react-dom` are NOT inlined — they should appear as external imports.
    - The `Button` function is exported.
 
@@ -283,14 +280,14 @@ Create a minimal Vite + React consumer application at `Lib/my-ui-test-app/`. Thi
 4. In `my-ui-test-app/package.json`, add the library as a local dependency:
    ```json
    "dependencies": {
-     "formLibrary": "file:../formLibrary"
+     "skemvora": "file:../skemvora"
    }
    ```
 5. Run `npm install` again to install the local library link.
 
 **Output Criteria:**
 - `my-ui-test-app/` folder exists with a working Vite React scaffold.
-- `node_modules/formLibrary/` is present in the test app's `node_modules`.
+- `node_modules/skemvora/` is present in the test app's `node_modules`.
 
 ---
 
@@ -302,14 +299,14 @@ Create a minimal Vite + React consumer application at `Lib/my-ui-test-app/`. Thi
 **Depends On:** Task 8
 
 **Description:**
-Update `my-ui-test-app/src/App.jsx` to import and render both button variants from `formLibrary`. This is the end-to-end rendering test.
+Update `my-ui-test-app/src/App.jsx` to import and render both button variants from `skemvora`. This is the end-to-end rendering test.
 
 **Steps:**
 1. Open `my-ui-test-app/src/App.jsx`.
 2. Replace its content with the following (or edit to include):
    ```jsx
-   import { Button } from 'formLibrary';
-   import 'formLibrary/dist/style.css';
+   import { Button } from 'skemvora';
+   import 'skemvora/dist/style.css';
 
    function App() {
      return (
@@ -350,18 +347,18 @@ Update `my-ui-test-app/src/App.jsx` to import and render both button variants fr
 **Depends On:** Tasks 7, 9
 
 **Description:**
-Write a complete `README.md` inside `formLibrary/` so any developer (or their AI assistant) can install, use, and contribute to the library without needing to read internal source code.
+Write a complete `README.md` inside `skemvora/` so any developer (or their AI assistant) can install, use, and contribute to the library without needing to read internal source code.
 
 **Sections to include:**
 
-1. **Project Title & Description** — What `formLibrary` is.
+1. **Project Title & Description** — What `skemvora` is.
 2. **Installation**
-   - Local (file-based): `"formLibrary": "file:../formLibrary"`
-   - Future NPM (placeholder): `npm install formLibrary`
-3. **CSS Import** — Add `import 'formLibrary/dist/style.css';` at app root.
+   - Local (file-based): `"skemvora": "file:../skemvora"`
+   - Future NPM (placeholder): `npm install skemvora`
+3. **CSS Import** — Add `import 'skemvora/dist/style.css';` at app root.
 4. **Usage Example** — Full code snippet showing both variants:
    ```jsx
-   import { Button } from 'formLibrary';
+   import { Button } from 'skemvora';
    <Button label="Click Me" variant="primary" onClick={() => {}} />
    <Button label="Cancel" variant="secondary" onClick={() => {}} />
    ```
@@ -380,7 +377,7 @@ Write a complete `README.md` inside `formLibrary/` so any developer (or their AI
 8. **Contributing** — How to add a new component (create folder, add CSS, export from `src/index.js`).
 
 **Output Criteria:**
-- `formLibrary/README.md` contains all 8 sections.
+- `skemvora/README.md` contains all 8 sections.
 - Props table is correctly formatted markdown.
 - A new team member can set up and use the library by following the README alone.
 
@@ -397,7 +394,7 @@ Write a complete `README.md` inside `formLibrary/` so any developer (or their AI
 Create the folder and file scaffolding for the new `Form` component inside the library. The `Form` component accepts a `data` prop (an array of field config objects) and dynamically renders the appropriate form fields based on each item's `type`.
 
 **Steps:**
-1. Create the folder: `formLibrary/src/components/Form/`.
+1. Create the folder: `skemvora/src/components/Form/`.
 2. Create three files inside it:
    - `Form.js` — the main functional component (see Task 12 for implementation).
    - `Form.css` — scoped styles (see Task 13).
@@ -435,7 +432,7 @@ const formData = [
 
 **Usage Example:**
 ```jsx
-import { Form } from 'formLibrary';
+import { Form } from 'skemvora';
 
 const formData = [
   { label: "Full Name", type: "text", required: true },
@@ -510,7 +507,7 @@ const formData = [
 Create the CSS file for the `Form` component. Fields must render **vertically (column-wise)**. Styling must be scoped using specific class names to avoid conflicts with the rest of the library.
 
 **Steps:**
-1. Open `formLibrary/src/components/Form/Form.css`.
+1. Open `skemvora/src/components/Form/Form.css`.
 2. Implement the following CSS rules:
 
    **`.form-wrapper`** — the outer `<form>` container:
@@ -577,21 +574,21 @@ Register the `Form` component in the library's barrel file so it is publicly ava
 **Export Requirement:**
 - `Form` must be exported from `src/index.js` so consumers can import it as:
   ```js
-  import { Form } from 'formLibrary';
+  import { Form } from 'skemvora';
   ```
 
 **Steps:**
-1. Open `formLibrary/src/index.js` and add the Form export:
+1. Open `skemvora/src/index.js` and add the Form export:
    ```js
    export { Button } from './components/Button';
    export { Form }   from './components/Form';   // ← Add this line
    ```
-2. Run `npm run build` inside `formLibrary/` to rebuild the `dist/` output.
+2. Run `npm run build` inside `skemvora/` to rebuild the `dist/` output.
 3. Re-link the library in `my-ui-test-app/` (run `npm install` inside the test app).
 4. Open `my-ui-test-app/src/App.jsx` and add a test render:
    ```jsx
-   import { Button, Form } from 'formLibrary';
-   import 'formLibrary/dist/style.css';
+   import { Button, Form } from 'skemvora';
+   import 'skemvora/dist/style.css';
 
    const formData = [
      { label: 'Full Name',  type: 'text',     required: true },
@@ -740,7 +737,7 @@ No additional setup or internal path imports should be required from the consume
 Set up the complete `fields/` folder structure inside `src/components/`. This scaffold will house all individual field components. Creating this structure first ensures every team member works within the same organized layout before writing any component logic.
 
 **Steps:**
-1. Inside `formLibrary/src/components/`, create a new folder named `fields/`.
+1. Inside `skemvora/src/components/`, create a new folder named `fields/`.
 2. Inside `fields/`, create one subfolder for each field type:
    - `BaseField/`
    - `TextField/`
@@ -757,7 +754,7 @@ Set up the complete `fields/` folder structure inside `src/components/`. This sc
    - `[FieldName].js` — component file (leave empty for now)
    - `[FieldName].css` — styles file (leave empty for now)
    - `index.js` — barrel re-export (leave empty for now)
-4. Also create the `utils/` folder at `formLibrary/src/utils/` and add an empty `fieldMapper.js` file.
+4. Also create the `utils/` folder at `skemvora/src/utils/` and add an empty `fieldMapper.js` file.
 
 **Output Criteria:**
 - `src/components/fields/` exists with all 11 subfolders.
@@ -777,7 +774,7 @@ Set up the complete `fields/` folder structure inside `src/components/`. This sc
 Build the `BaseField` component — a shared wrapper that every field component uses for consistent layout. It renders the label, the required asterisk, and a slot for the actual input. This eliminates repeated label/wrapper code across all 10 field components and keeps the UI consistent.
 
 **Steps:**
-1. Open `formLibrary/src/components/fields/BaseField/BaseField.js`.
+1. Open `skemvora/src/components/fields/BaseField/BaseField.js`.
 2. Implement as a named export React functional component:
    ```js
    import './BaseField.css';
@@ -822,7 +819,7 @@ Build the `BaseField` component — a shared wrapper that every field component 
 Build the `TextField` component for `type: "text"` fields. It wraps `BaseField` for layout and renders a standard text input. This is the simplest and most common field type — a good first component to implement after `BaseField`.
 
 **Steps:**
-1. Open `formLibrary/src/components/fields/TextField/TextField.js`.
+1. Open `skemvora/src/components/fields/TextField/TextField.js`.
 2. Implement as a named export:
    ```js
    import './TextField.css';
@@ -1053,7 +1050,7 @@ Extract the radio input logic from the existing `Form.js` (Task 12) into a dedic
 Create the `fieldMapper` utility at `src/utils/fieldMapper.js`. This is a plain JavaScript object that maps each field `type` string to its corresponding component. `Form.js` imports this object to dynamically resolve which component to render — keeping `Form.js` clean with zero `if/else` or `switch` statements.
 
 **Steps:**
-1. Open `formLibrary/src/utils/fieldMapper.js`.
+1. Open `skemvora/src/utils/fieldMapper.js`.
 2. Implement the mapper object as a named export:
    ```js
    import { TextField }    from '../components/fields/TextField';
@@ -1100,7 +1097,7 @@ Create the `fieldMapper` utility at `src/utils/fieldMapper.js`. This is a plain 
 Refactor `Form.js` to use the `fieldMapper` utility for dynamic field rendering. The updated `Form.js` should contain **no field-specific logic** — it only loops through the `data` array, resolves the correct component from `fieldMapper`, and renders it. This keeps `Form.js` permanently clean regardless of how many field types are added in the future.
 
 **Steps:**
-1. Open `formLibrary/src/components/Form/Form.js` and replace its implementation:
+1. Open `skemvora/src/components/Form/Form.js` and replace its implementation:
    ```js
    import './Form.css';
    import { fieldMapper } from '../../utils/fieldMapper';
@@ -1172,7 +1169,7 @@ Refactor `Form.js` to use the `fieldMapper` utility for dynamic field rendering.
 Wire up all exports, rebuild the library, and run a full end-to-end verification in `my-ui-test-app`. This is the final integration task for Phase 3 — every field type should render correctly with proper labels, spacing, and required indicators.
 
 **Steps:**
-1. Open `formLibrary/src/index.js` and ensure all exports are present:
+1. Open `skemvora/src/index.js` and ensure all exports are present:
    ```js
    export { Button }      from './components/Button';
    export { Form }        from './components/Form';
@@ -1187,12 +1184,12 @@ Wire up all exports, rebuild the library, and run a full end-to-end verification
    export { DateField }   from './components/fields/DateField';
    export { NumberField } from './components/fields/NumberField';
    ```
-2. Run `npm run build` inside `formLibrary/` to rebuild `dist/`.
+2. Run `npm run build` inside `skemvora/` to rebuild `dist/`.
 3. Run `npm install` inside `my-ui-test-app/` to re-link the updated library.
 4. Open `my-ui-test-app/src/App.jsx` and add a test render covering all field types:
    ```js
-   import { Form } from 'formLibrary';
-   import 'formLibrary/dist/style.css';
+   import { Form } from 'skemvora';
+   import 'skemvora/dist/style.css';
 
    const formData = [
      { label: "Full Name",   type: "text",     required: true },
@@ -1229,7 +1226,7 @@ Wire up all exports, rebuild the library, and run a full end-to-end verification
 **Output Criteria:**
 - All 10 field types render correctly in the browser.
 - `npm run build` completes with no errors.
-- The library supports `import { Form } from "formLibrary"` as the only consumer import.
+- The library supports `import { Form } from "skemvora"` as the only consumer import.
 - Form layout is clean, column-wise, and production-ready.
 
 ---
@@ -1550,7 +1547,7 @@ Update the local test application (`my-ui-test-app/src/App.jsx`) to demonstrate 
 **Depends On:** Task 28
 
 **Description:**
-Add a new `checkboxGroup` field type to `formLibrary` that supports multiple selections from a given array of options. Update the `CheckboxGroupField` CSS to allow natural flex layout without forcing a `flex-direction: column`, enabling developers to control layout via the `style` prop. Verify by providing single-column and multi-column examples in the local test app.
+Add a new `checkboxGroup` field type to `skemvora` that supports multiple selections from a given array of options. Update the `CheckboxGroupField` CSS to allow natural flex layout without forcing a `flex-direction: column`, enabling developers to control layout via the `style` prop. Verify by providing single-column and multi-column examples in the local test app.
 
 ---
 
@@ -1835,7 +1832,7 @@ Update `my-ui-test-app` to include the following examples to verify grid functio
   - Form submission remains unchanged.
 
 ### Steps:
-- [x] Implement grid wrapper styles and grid item class generation in `formLibrary`.
+- [x] Implement grid wrapper styles and grid item class generation in `skemvora`.
 - [x] Update field components or their wrapping structures to accept responsive grid classes/styles.
 - [x] Enable `rowGap` and `columnGap` customization via `formStyles.grid` in both `<Form />` and `<ConditionalForm />`.
 - [x] Ensure that hidden fields in `<ConditionalForm />` do not output empty grid elements.

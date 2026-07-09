@@ -1,19 +1,36 @@
 {
-  "name": "form-library",
-  "version": "1.0.0",
-  "description": "A React form library",
-  "main": "./dist/formLibrary.umd.js",
-  "module": "./dist/formLibrary.es.js",
-  "style": "./dist/styles.css",
-  "exports": {
-    ".": {
-      "import": "./dist/formLibrary.es.js",
-      "require": "./dist/formLibrary.umd.js"
-    },
-    "./dist/styles.css": "./dist/styles.css"
+  "name": "skemvora",
+  "version": "1.0.1",
+  "description": "Skemvora - A schema-driven React form library.",
+  "license": "MIT",
+  "keywords": [
+    "react",
+    "schema",
+    "forms",
+    "dynamic-forms",
+    "react-library",
+    "form-builder",
+    "skemvora",
+    "formlibrary"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReenaKanwar/formlibrary.git"
   },
   "files": [
     "dist"
+  ],
+  "main": "./dist/skemvora.umd.js",
+  "module": "./dist/skemvora.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/skemvora.es.js",
+      "require": "./dist/skemvora.umd.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "sideEffects": [
+    "*.css"
   ],
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
@@ -27,7 +44,8 @@
     "vite-plugin-lib-inject-css": "^2.2.2"
   },
   "scripts": {
+    "dev": "vite",
     "build": "vite build",
-    "dev": "vite"
+    "prepublishOnly": "npm run build"
   }
 }
