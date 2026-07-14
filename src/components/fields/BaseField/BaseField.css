@@ -33,3 +33,53 @@
   background-color: #f3f4f6;
 }
 
+
+/* --- Size Variations (Task 45) --- */
+/* Small */
+.base-field--size-small .base-field__label { font-size: 12px; }
+.base-field--size-small .text-field__input,
+.base-field--size-small .select-base__control,
+.base-field--size-small .inner-input,
+.base-field--size-small .textarea-field__input,
+.base-field--size-small .date-field__input,
+.base-field--size-small .file-field__input,
+.base-field--size-small .number-field__input,
+.base-field--size-small .password-field__input,
+.base-field--size-small .email-field__input {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+.base-field--size-small .prefix-suffix-wrapper .inner-input { padding: 6px 0; }
+.base-field--size-small .prefix-suffix-wrapper:not(.has-prefix) .inner-input { padding-left: 8px; }
+.base-field--size-small .prefix-suffix-wrapper:not(.has-suffix) .inner-input { padding-right: 8px; }
+.base-field--size-small .field-prefix, .base-field--size-small .field-suffix { font-size: 12px; padding: 6px 8px; }
+.base-field--size-small .select-base__option { padding: 6px 8px; font-size: 12px; }
+.base-field--size-small .checkbox-field__label, .base-field--size-small .radio-field__label { font-size: 12px; }
+.base-field--size-small .checkbox-field__input, .base-field--size-small .radio-field__input { width: 14px; height: 14px; }
+.base-field--size-small .repeatable-group__block-title { font-size: 13px; }
+.base-field--size-small .select-base__multi-tag { font-size: 11px; padding: 2px 4px; }
+
+/* Large */
+.base-field--size-large .base-field__label { font-size: 16px; }
+.base-field--size-large .text-field__input,
+.base-field--size-large .select-base__control,
+.base-field--size-large .inner-input,
+.base-field--size-large .textarea-field__input,
+.base-field--size-large .date-field__input,
+.base-field--size-large .file-field__input,
+.base-field--size-large .number-field__input,
+.base-field--size-large .password-field__input,
+.base-field--size-large .email-field__input {
+  padding: 14px 16px;
+  font-size: 16px;
+}
+.base-field--size-large .prefix-suffix-wrapper .inner-input { padding: 14px 0; }
+.base-field--size-large .prefix-suffix-wrapper:not(.has-prefix) .inner-input { padding-left: 16px; }
+.base-field--size-large .prefix-suffix-wrapper:not(.has-suffix) .inner-input { padding-right: 16px; }
+.base-field--size-large .field-prefix, .base-field--size-large .field-suffix { font-size: 16px; padding: 14px 16px; }
+.base-field--size-large .select-base__option { padding: 14px 16px; font-size: 16px; }
+.base-field--size-large .checkbox-field__label, .base-field--size-large .radio-field__label { font-size: 16px; }
+.base-field--size-large .checkbox-field__input, .base-field--size-large .radio-field__input { width: 20px; height: 20px; }
+.base-field--size-large .repeatable-group__block-title { font-size: 18px; }
+.base-field--size-large .select-base__multi-tag { font-size: 14px; padding: 4px 8px; }
+

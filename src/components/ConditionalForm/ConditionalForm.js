@@ -9,6 +9,7 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
     const [values, setValues] = useState(() => {
         const initial = {};
         data.forEach((field) => {
+            if (field.type === 'content') return;
             const key = field.name || field.label;
             if (field.type === 'repeatableGroup') {
                 const minItems = field.minItems || 0;
@@ -77,6 +78,7 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
                     groupVals.forEach((blockVal, index) => {
                         let blockErrors = null;
                         (field.fields || []).forEach(subField => {
+                            if (subField.type === 'content') return;
                             if (subField.condition && !evaluateCondition(subField.condition, blockVal)) {
                                 return;
                             }
@@ -144,6 +146,7 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
         // Extract only the visible field values for the callback
         const submittedValues = {};
         visibleFields.forEach(field => {
+            if (field.type === 'content') return;
             const key = field.name || field.label;
             if (values[key] !== undefined) {
                 submittedValues[key] = values[key];
@@ -173,8 +176,10 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
         if (formStyles.grid.columnGap) containerStyle.columnGap = formStyles.grid.columnGap;
     }
 
+    const resolvedSize = formStyles.size || 'medium';
+
     return (
-        <form className="conditional-form-wrapper" onSubmit={handleFormSubmit} noValidate style={containerStyle}>
+        <form className={`conditional-form-wrapper conditional-form-wrapper--size-${resolvedSize}`} onSubmit={handleFormSubmit} noValidate style={containerStyle}>
             {visibleFields.map((field, index) => {
                 const FieldComponent = fieldMapper[field.type];
 
@@ -206,6 +211,7 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
                             addControl={field.addControl}
                             removeControl={field.removeControl}
                             variant={field.variant}
+                            size={field.size}
                             content={field.content}
                             textAlign={field.textAlign}
                             maxDigits={field.maxDigits}

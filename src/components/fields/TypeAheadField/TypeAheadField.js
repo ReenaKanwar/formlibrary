@@ -28,15 +28,14 @@ export function TypeAheadField({
   const timerRef       = useRef(null);
   const isFirstRender  = useRef(true);
 
-  /* Set selectedOption from initial value */
+  /* Set selectedOption from initial value or external value change */
   useEffect(() => {
-    if (value && !selectedOption) {
+    if (value && (!selectedOption || selectedOption.value !== value)) {
       setSelectedOption({ label: String(value), value });
-    }
-    if (!value && selectedOption) {
+    } else if (!value && selectedOption) {
       setSelectedOption(null);
     }
-  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value, selectedOption]);
 
   /* Fetch all options upfront if minSearchLength === 0 (static-style usage) */
   useEffect(() => {
@@ -44,11 +43,24 @@ export function TypeAheadField({
       isFirstRender.current = false;
       let active = true;
       setIsLoading(true);
-      loadOptions('').then(res => {
-        if (active) { setAsyncOptions(res || []); setIsLoading(false); }
-      }).catch(() => {
-        if (active) { setAsyncOptions([]); setIsLoading(false); }
-      });
+      
+      try {
+        const result = loadOptions('');
+        if (result && typeof result.then === 'function') {
+          result.then(res => {
+            if (active) { setAsyncOptions(res || []); setIsLoading(false); }
+          }).catch(() => {
+            if (active) { setAsyncOptions([]); setIsLoading(false); }
+          });
+        } else {
+          setAsyncOptions(result || []);
+          setIsLoading(false);
+        }
+      } catch (err) {
+        console.error('TypeAhead initial load error:', err);
+        setAsyncOptions([]);
+        setIsLoading(false);
+      }
       return () => { active = false; };
     }
   }, [minSearchLength, loadOptions]);
@@ -68,8 +80,13 @@ export function TypeAheadField({
       setIsLoading(true);
       timerRef.current = setTimeout(async () => {
         try {
-          const results = await loadOptions(term);
-          setAsyncOptions(results || []);
+          const result = loadOptions(term);
+          if (result && typeof result.then === 'function') {
+            const results = await result;
+            setAsyncOptions(results || []);
+          } else {
+            setAsyncOptions(result || []);
+          }
         } catch (err) {
           console.error('TypeAhead loadOptions error:', err);
           setAsyncOptions([]);
