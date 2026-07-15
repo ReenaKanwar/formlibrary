@@ -13,6 +13,7 @@ import { RepeatableGroup } from '../components/fields/RepeatableGroup';
 import { ContentField } from '../components/fields/ContentField';
 import { MultiSelectField } from '../components/fields/MultiSelectField';
 import { TypeAheadField } from '../components/fields/TypeAheadField';
+import { SliderField } from '../components/fields/SliderField/SliderField';
 
 export const fieldMapper = {
   text:     TextField,
@@ -30,4 +31,5 @@ export const fieldMapper = {
   content:  ContentField,
   multiSelect: MultiSelectField,
   typeAhead: TypeAheadField,
+  slider: SliderField,
 };

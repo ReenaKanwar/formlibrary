@@ -2972,6 +2972,272 @@ Add examples in `my-test-ui-app` showing:
 
 ---
 
+### Task 42 — Exclude Display-Only Fields from Form Submission
+
+**Status:** `[x] Done`
+
+**Assignee:** AI
+
+**Depends On:** Task 37, Task 41
+
+**Objective:**
+Ensure that display-only fields such as `type: "content"` are never treated as form input fields.
+
+**Requirements:**
+
+* `type: "content"` should NOT be included in the submitted form data.
+* It should NOT be stored in the internal form state.
+* It should NOT participate in validation.
+* It should NOT trigger `onChange` or value updates.
+* It should still support:
+  * Conditional rendering
+  * Grid layout
+  * Global `formStyles`
+  * Inline `style`
+  * `className`
+* Existing behavior for all input fields must remain unchanged.
+
+**Acceptance Criteria:**
+
+* Content fields are rendered correctly.
+* Form submission excludes all content fields.
+* Validation ignores content fields.
+* No regression in `Form` or `ConditionalForm`.
+
+---
+
+### Task 43 — Support TypeAhead inside RepeatableGroup
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 36, Task 41
+
+**Objective:**
+Fix TypeAhead so that it works correctly inside RepeatableGroup.
+
+**Requirements:**
+
+Each repeated row must maintain its own:
+
+* selected value
+* search text
+* dropdown state
+* loading state
+* options list
+
+TypeAhead inside RepeatableGroup should behave exactly the same as outside RepeatableGroup.
+
+**Verification:**
+
+* Adding new rows works correctly.
+* Removing rows does not affect other rows.
+* Searching in one row does not update another row.
+* Async loading works independently for every row.
+* Validation continues working correctly.
+
+**Acceptance Criteria:**
+
+* Multiple RepeatableGroup rows can contain TypeAhead fields.
+* Every row behaves independently.
+* No shared state between rows.
+
+---
+
+### Task 44 — Support Both Synchronous and Asynchronous TypeAhead
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 41
+
+**Objective:**
+Enhance the TypeAhead component so that developers can provide either a synchronous JavaScript function or an asynchronous Promise.
+
+**Current Limitation:**
+
+Only async functions are supported.
+
+**Required Behavior:**
+
+Support both:
+
+Example 1 (Synchronous):
+```js
+loadOptions: (searchText) => {
+    return data.filter(...)
+}
+```
+
+Example 2 (Asynchronous):
+```js
+loadOptions: async (searchText) => {
+    const response = await fetch(...)
+    return response.data;
+}
+```
+
+Internally detect whether the return value is a Promise.
+
+If Promise:
+* Show loading state.
+* Await completion.
+* Render options.
+
+If Array:
+* Render immediately.
+
+**Acceptance Criteria:**
+
+* Existing async implementations continue working.
+* Sync implementations also work.
+* No API changes required for existing users.
+
+---
+
+### Task 45 — Add Field Size Support
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 41
+
+**Objective:**
+Allow every supported field to render in multiple predefined sizes.
+
+**Supported Sizes:**
+
+* `small`
+* `medium` (default)
+* `large`
+
+The `size` property should affect:
+
+* input height
+* padding
+* font size
+* icons
+* chips
+* dropdowns
+* buttons
+* textareas
+* typeAhead
+* select
+* multiSelect
+
+**Example:**
+```js
+{
+    label: "Email",
+    type: "email",
+    size: "small"
+}
+```
+
+**Global Support:**
+
+Allow users to configure the default size through `formStyles`.
+
+Example:
+```js
+formStyles={{
+    size: "medium"
+}}
+```
+
+Field-level `size` should override the global `size`.
+
+**Acceptance Criteria:**
+
+* All supported fields respect `size`.
+* Existing forms continue working.
+* Default remains `medium`.
+
+---
+
+### Task 46 — Create SliderField Component
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 45
+
+**Objective:**
+Create a new SliderField component for selecting numeric values using a draggable slider.
+
+**Supported Properties:**
+
+* `label`
+* `name`
+* `min`
+* `max`
+* `step`
+* `defaultValue`
+* `disabled`
+* `required`
+* `grid`
+* `style`
+* `className`
+* `size`
+* `condition`
+
+**Behavior:**
+
+* Allow dragging the slider.
+* Display current selected value.
+* Participate in validation.
+* Submit numeric value.
+* Work inside `Form`.
+* Work inside `ConditionalForm`.
+
+**Future Extensibility:**
+
+The component architecture should make it easy to support future variants such as:
+
+* rating
+* emoji
+* custom thumb icons
+
+without requiring major code changes.
+
+**Acceptance Criteria:**
+
+* Slider works in `Form`.
+* Slider works in `ConditionalForm`.
+* Validation works.
+* Submitted value is numeric.
+
+---
+
+### Testing — Verify All New Features in Test App
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 42, Task 43, Task 44, Task 45, Task 46
+
+**Objective:**
+Update `my-test-ui-app` to include demonstrations for all new features.
+
+**Test App Examples:**
+
+1. Content field not appearing in submitted data.
+2. TypeAhead inside RepeatableGroup.
+3. Synchronous `loadOptions` example.
+4. Asynchronous `loadOptions` example.
+5. Small / Medium / Large field size comparison.
+6. SliderField example.
+
+**Verification:**
+
+Verify all examples manually after implementation.
+
+Do not stop after code changes.
+Run `my-test-ui-app` and ensure every new feature behaves correctly without breaking any existing functionality.
+
+**Acceptance Criteria:**
+
+* All six examples render and function correctly.
+* No regressions in existing test app examples.
+* All new features are demonstrated end-to-end.
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -3018,6 +3284,12 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
                                                                                                    └── Task 39 (Add Prefix / Suffix Support for Text & Number Fields)
                                                                                                         └── Task 40 (Add MultiSelect Field Support)
                                                                                                              └── Task 41 (Add TypeAhead Field Support)
+                                                                                                                  ├── Task 42 (Exclude Display-Only Fields from Form Submission)
+                                                                                                                  ├── Task 43 (Support TypeAhead inside RepeatableGroup)
+                                                                                                                  ├── Task 44 (Support Both Sync and Async TypeAhead)
+                                                                                                                  └── Task 45 (Add Field Size Support)
+                                                                                                                       └── Task 46 (Create SliderField Component)
+                                                                                                                            └── Testing (Verify All New Features)
 ```
 
 ---

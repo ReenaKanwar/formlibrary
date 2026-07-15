@@ -9,6 +9,7 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
     const [values, setValues] = useState(() => {
         const initial = {};
         data.forEach((field) => {
+            if (field.type === 'content') return;
             const key = field.name || field.label;
             if (field.type === 'repeatableGroup') {
                 // Prefill with initialValues array, else start with one empty block (or minItems blocks)
@@ -74,6 +75,7 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
                     groupVals.forEach((blockVal, index) => {
                         let blockErrors = null;
                         (field.fields || []).forEach(subField => {
+                            if (subField.type === 'content') return;
                             if (subField.condition && !evaluateCondition(subField.condition, blockVal)) {
                                 return;
                             }
@@ -138,12 +140,21 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
             }
         }
 
+        const submittedValues = {};
+        data.forEach(field => {
+            if (field.type === 'content') return;
+            const key = field.name || field.label;
+            if (values[key] !== undefined) {
+                submittedValues[key] = values[key];
+            }
+        });
+
         if (btnConfig.onClick) {
-            btnConfig.onClick(values);
+            btnConfig.onClick(submittedValues);
         }
 
         if (btnConfig.type === 'submit' && onSubmit) {
-            onSubmit(values);
+            onSubmit(submittedValues);
         }
     };
 
@@ -161,8 +172,10 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
         if (formStyles.grid.columnGap) containerStyle.columnGap = formStyles.grid.columnGap;
     }
 
+    const resolvedSize = formStyles.size || 'medium';
+
     return (
-        <form className="form-wrapper" onSubmit={handleFormSubmit} noValidate style={containerStyle}>
+        <form className={`form-wrapper form-wrapper--size-${resolvedSize}`} onSubmit={handleFormSubmit} noValidate style={containerStyle}>
             {data.map((field, index) => {
                 const FieldComponent = fieldMapper[field.type];
 
@@ -194,6 +207,7 @@ export function Form({ data = [], onSubmit, onChange, formStyles = {}, initialVa
                             addControl={field.addControl}
                             removeControl={field.removeControl}
                             variant={field.variant}
+                            size={field.size}
                             content={field.content}
                             textAlign={field.textAlign}
                             maxDigits={field.maxDigits}

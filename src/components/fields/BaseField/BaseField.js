@@ -1,6 +1,6 @@
 import './BaseField.css';
 
-export function BaseField({ label, required, errorMessage, children, formStyles = {}, labelStyle = {}, labelGap }) {
+export function BaseField({ label, required, errorMessage, children, formStyles = {}, labelStyle = {}, labelGap, size }) {
   const containerStyle = { ...(formStyles.fieldWrapper || {}) };
   if (labelGap) {
     containerStyle.gap = labelGap;
@@ -11,8 +11,11 @@ export function BaseField({ label, required, errorMessage, children, formStyles 
     ...(labelStyle || {}),
   };
 
+  const resolvedSize = size || formStyles.size || 'medium';
+  const sizeClass = `base-field--size-${resolvedSize}`;
+
   return (
-    <div className="base-field" style={containerStyle}>
+    <div className={`base-field ${sizeClass}`} style={containerStyle}>
       {label && (
         <label className="base-field__label" style={mergedLabelStyle}>
           {label}

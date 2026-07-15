@@ -3,6 +3,7 @@ import { BaseField } from '../BaseField';
 import { fieldMapper } from '../../../utils/fieldMapper';
 import { normalizeGrid } from '../../../utils/normalizeGrid';
 import { evaluateCondition } from '../../../utils/conditionEvaluator';
+import { useState, useEffect } from 'react';
 
 export function RepeatableGroup(props) {
   const {
@@ -13,13 +14,29 @@ export function RepeatableGroup(props) {
     addButtonText = 'Add', addControl, removeControl
   } = props;
 
-  // Normalise value into an array, padding to minItems if needed
   let currentValues = Array.isArray(value) ? value : [];
   if (currentValues.length < minItems) {
     const padded = [...currentValues];
     while (padded.length < minItems) padded.push({});
     currentValues = padded;
   }
+
+  // ─── stable keys for nested components with state ────────────────────
+  const [rowKeys, setRowKeys] = useState(() => currentValues.map(() => crypto.randomUUID()));
+
+  useEffect(() => {
+    // Sync rowKeys length if currentValues changes externally
+    if (currentValues.length !== rowKeys.length) {
+      setRowKeys(prev => {
+        if (currentValues.length > prev.length) {
+          const newKeys = Array(currentValues.length - prev.length).fill(0).map(() => crypto.randomUUID());
+          return [...prev, ...newKeys];
+        } else {
+          return prev.slice(0, currentValues.length);
+        }
+      });
+    }
+  }, [currentValues.length]);
 
   // ─── position helpers ────────────────────────────────────────────────
   const addPos    = addControl?.position    || 'footer-right';
@@ -29,12 +46,14 @@ export function RepeatableGroup(props) {
   const handleAdd = (e) => {
     if (e) e.preventDefault();
     if (currentValues.length >= maxItems) return;
+    setRowKeys(prev => [...prev, crypto.randomUUID()]);
     onChange([...currentValues, {}]);
   };
 
   const handleRemove = (index, e) => {
     if (e) e.preventDefault();
     if (currentValues.length <= minItems) return;
+    setRowKeys(prev => prev.filter((_, i) => i !== index));
     const next = [...currentValues];
     next.splice(index, 1);
     onChange(next);
@@ -201,7 +220,7 @@ export function RepeatableGroup(props) {
               ? errorMessage[index] : {};
 
             return (
-              <div key={index} className="repeatable-group__block">
+              <div key={rowKeys[index] || index} className="repeatable-group__block">
 
                 {renderBlockHeader(index)}
 
@@ -241,6 +260,7 @@ export function RepeatableGroup(props) {
                           style={fieldConfig.style}
                           labelStyle={fieldConfig.labelStyle}
                           labelGap={formStyles.labelGap}
+                          size={fieldConfig.size}
                           disabled={disabled || !!fieldConfig.disabled}
                         />
                       </div>

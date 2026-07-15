@@ -26,3 +26,8 @@
 .conditional-form-submit-btn:hover {
   background-color: #4338ca;
 }
+
+/* --- Global Form Size Overrides (Task 45) --- */
+.conditional-form-wrapper--size-small .conditional-form-submit-btn { padding: 8px 16px; font-size: 13px; }
+.conditional-form-wrapper--size-large .conditional-form-submit-btn { padding: 14px 24px; font-size: 16px; }
+
