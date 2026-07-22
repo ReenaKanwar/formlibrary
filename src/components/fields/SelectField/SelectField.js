@@ -16,6 +16,7 @@ export function SelectField({
   labelStyle,
   labelGap,
   disabled,
+  size,
 }) {
   const handleSelect = (selectedValue) => {
     if (onChange) onChange({ target: { value: selectedValue } });
@@ -29,6 +30,7 @@ export function SelectField({
       formStyles={formStyles}
       labelStyle={labelStyle}
       labelGap={labelGap}
+      size={size}
     >
       <SelectBase
         options={options}

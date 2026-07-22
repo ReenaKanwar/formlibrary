@@ -28,8 +28,11 @@ export const fieldMapper = {
   date:     DateField,
   number:   NumberField,
   repeatableGroup: RepeatableGroup,
+  repeatable: RepeatableGroup,        // alias
   content:  ContentField,
   multiSelect: MultiSelectField,
+  multiselect: MultiSelectField,      // alias
   typeAhead: TypeAheadField,
+  typeahead: TypeAheadField,          // alias
   slider: SliderField,
 };

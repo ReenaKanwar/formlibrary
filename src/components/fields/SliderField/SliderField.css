@@ -5,12 +5,19 @@
   width: 100%;
 }
 
+.slider-field__control-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
 .slider-field__input {
   flex: 1;
   cursor: pointer;
   accent-color: #4f46e5;
   height: 6px;
   border-radius: 4px;
+  outline: none;
 }
 
 .slider-field__input:disabled {
@@ -27,10 +34,96 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Sizing overrides inherited from BaseField */
+/* Rating Variant */
+.slider-rating-container {
+  display: flex;
+  gap: 6px;
+  font-size: 24px;
+  user-select: none;
+}
+
+.slider-rating-star {
+  cursor: pointer;
+  color: #d1d5db;
+  transition: color 0.15s ease, transform 0.1s ease;
+}
+
+.slider-rating-star:hover {
+  transform: scale(1.15);
+}
+
+.slider-rating-star--active {
+  color: #fbbf24;
+}
+
+.slider-rating-container--disabled .slider-rating-star {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.slider-rating-container--disabled .slider-rating-star:hover {
+  transform: none;
+}
+
+/* Emoji Variant */
+.slider-emoji-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.slider-emoji-display {
+  font-size: 28px;
+  min-width: 36px;
+  text-align: center;
+  user-select: none;
+}
+
+/* Icon Variant */
+.slider-icon-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.slider-icon {
+  font-size: 18px;
+  color: #6b7280;
+  user-select: none;
+}
+
+/* --- Size Variations (Task 45) --- */
+
+/* Small */
 .base-field--size-small .slider-field__value-display {
   font-size: 12px;
 }
+.base-field--size-small .slider-rating-container {
+  font-size: 18px;
+  gap: 4px;
+}
+.base-field--size-small .slider-emoji-display {
+  font-size: 20px;
+  min-width: 28px;
+}
+.base-field--size-small .slider-icon {
+  font-size: 14px;
+}
+
+/* Large */
 .base-field--size-large .slider-field__value-display {
   font-size: 16px;
+}
+.base-field--size-large .slider-rating-container {
+  font-size: 30px;
+  gap: 8px;
+}
+.base-field--size-large .slider-emoji-display {
+  font-size: 36px;
+  min-width: 44px;
+}
+.base-field--size-large .slider-icon {
+  font-size: 22px;
 }

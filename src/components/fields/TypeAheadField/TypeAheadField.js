@@ -19,56 +19,91 @@ export function TypeAheadField({
   minSearchLength = 1,
   isClearable = true,
   placeholder,
+  size,
 }) {
   const [asyncOptions, setAsyncOptions]   = useState([]);
   const [isLoading, setIsLoading]         = useState(false);
   const [searchTerm, setSearchTerm]       = useState('');
   const [selectedOption, setSelectedOption] = useState(null);   // { label, value }
 
-  const timerRef       = useRef(null);
-  const isFirstRender  = useRef(true);
+  const timerRef        = useRef(null);
+  const activeSearchRef = useRef('');
 
-  /* Set selectedOption from initial value or external value change */
-  useEffect(() => {
-    if (value && (!selectedOption || selectedOption.value !== value)) {
-      setSelectedOption({ label: String(value), value });
-    } else if (!value && selectedOption) {
-      setSelectedOption(null);
+  // Helper to find label from options array
+  const findOptionLabel = (val, opts) => {
+    if (!opts || !Array.isArray(opts)) return null;
+    const found = opts.find(opt => {
+      const optVal = typeof opt === 'object' ? opt.value : opt;
+      return optVal === val || String(optVal) === String(val);
+    });
+    if (found !== undefined) {
+      return typeof found === 'object' ? found.label : String(found);
     }
-  }, [value, selectedOption]);
+    return null;
+  };
 
-  /* Fetch all options upfront if minSearchLength === 0 (static-style usage) */
+  /* Sync selectedOption with incoming value prop */
   useEffect(() => {
-    if (minSearchLength === 0 && isFirstRender.current && loadOptions) {
-      isFirstRender.current = false;
+    if (value !== undefined && value !== null && value !== '') {
+      // If we already have a selectedOption matching this value, preserve the human-readable label!
+      if (selectedOption && (selectedOption.value === value || String(selectedOption.value) === String(value))) {
+        return;
+      }
+      // Otherwise attempt to resolve label from static or async options
+      const allOpts = staticOptions || asyncOptions || [];
+      const label = findOptionLabel(value, allOpts) || String(value);
+      setSelectedOption({ label, value });
+    } else {
+      setSelectedOption(null);
+      setSearchTerm('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, staticOptions]);
+
+  /* Fetch all options upfront if minSearchLength === 0 and loadOptions is present */
+  useEffect(() => {
+    if (minSearchLength === 0 && loadOptions) {
       let active = true;
       setIsLoading(true);
-      
       try {
         const result = loadOptions('');
         if (result && typeof result.then === 'function') {
           result.then(res => {
-            if (active) { setAsyncOptions(res || []); setIsLoading(false); }
+            if (active) {
+              setAsyncOptions(res || []);
+              setIsLoading(false);
+            }
           }).catch(() => {
-            if (active) { setAsyncOptions([]); setIsLoading(false); }
+            if (active) {
+              setAsyncOptions([]);
+              setIsLoading(false);
+            }
           });
         } else {
           setAsyncOptions(result || []);
           setIsLoading(false);
         }
       } catch (err) {
-        console.error('TypeAhead initial load error:', err);
-        setAsyncOptions([]);
-        setIsLoading(false);
+        if (active) {
+          setAsyncOptions([]);
+          setIsLoading(false);
+        }
       }
       return () => { active = false; };
     }
   }, [minSearchLength, loadOptions]);
 
-  /* ── Handle search input change ── */
+  /* Handle search input change */
   const handleSearchChange = (term) => {
     setSearchTerm(term);
+    activeSearchRef.current = term;
     if (timerRef.current) clearTimeout(timerRef.current);
+
+    // If an option was selected and user starts typing a new search, clear selection
+    if (selectedOption) {
+      setSelectedOption(null);
+      if (onChange) onChange({ target: { value: '' } });
+    }
 
     if (term.length < minSearchLength) {
       setAsyncOptions([]);
@@ -77,41 +112,53 @@ export function TypeAheadField({
     }
 
     if (loadOptions) {
-      setIsLoading(true);
-      timerRef.current = setTimeout(async () => {
-        try {
-          const result = loadOptions(term);
-          if (result && typeof result.then === 'function') {
-            const results = await result;
-            setAsyncOptions(results || []);
-          } else {
-            setAsyncOptions(result || []);
-          }
-        } catch (err) {
-          console.error('TypeAhead loadOptions error:', err);
-          setAsyncOptions([]);
-        } finally {
+      try {
+        const result = loadOptions(term);
+        if (result && typeof result.then === 'function') {
+          setIsLoading(true);
+          result.then(res => {
+            if (activeSearchRef.current === term) {
+              setAsyncOptions(res || []);
+              setIsLoading(false);
+            }
+          }).catch(() => {
+            if (activeSearchRef.current === term) {
+              setAsyncOptions([]);
+              setIsLoading(false);
+            }
+          });
+        } else {
+          // Synchronous loadOptions
+          setAsyncOptions(result || []);
           setIsLoading(false);
         }
-      }, 300);
+      } catch (err) {
+        console.error('TypeAhead loadOptions error:', err);
+        setAsyncOptions([]);
+        setIsLoading(false);
+      }
     }
   };
 
-  const handleSelect = (selectedValue) => {
-    const allOpts = loadOptions ? asyncOptions : (staticOptions || []);
-    const found = allOpts.find(opt =>
-      (typeof opt === 'object' ? opt.value : opt) === selectedValue
-    );
-    const label = found
-      ? (typeof found === 'object' ? found.label : found)
-      : String(selectedValue);
+  /* Handle option selection */
+  const handleSelect = (selectedValue, selectedOpt) => {
+    let label = selectedOpt
+      ? (typeof selectedOpt === 'object' ? selectedOpt.label : selectedOpt)
+      : null;
 
-    setSelectedOption({ label, value: selectedValue });
+    if (!label) {
+      const allOpts = loadOptions ? asyncOptions : (staticOptions || []);
+      label = findOptionLabel(selectedValue, allOpts) || String(selectedValue);
+    }
+
+    const newOption = { label: String(label), value: selectedValue };
+    setSelectedOption(newOption);
     setSearchTerm('');
     setAsyncOptions([]);
     if (onChange) onChange({ target: { value: selectedValue } });
   };
 
+  /* Handle clear */
   const handleClear = () => {
     setSelectedOption(null);
     setSearchTerm('');
@@ -119,7 +166,6 @@ export function TypeAheadField({
     if (onChange) onChange({ target: { value: '' } });
   };
 
-  /* Options shown: async results or static options (filtered by SelectBase) */
   const displayOptions = loadOptions ? asyncOptions : (staticOptions || []);
 
   const noResultsMessage = searchTerm.length < minSearchLength
@@ -134,12 +180,13 @@ export function TypeAheadField({
       formStyles={formStyles}
       labelStyle={labelStyle}
       labelGap={labelGap}
+      size={size}
     >
       <SelectBase
         isTypeAhead={true}
         options={displayOptions}
         isMulti={false}
-        selectedValues={value ? [value] : []}
+        selectedValues={selectedOption ? [selectedOption.value] : []}
         onSelect={handleSelect}
         onSearchChange={handleSearchChange}
         isLoading={isLoading}
