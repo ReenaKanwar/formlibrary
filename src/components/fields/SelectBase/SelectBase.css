@@ -173,15 +173,6 @@
   font-weight: 500;
 }
 
-.select-base__option--highlighted {
-  background-color: #f3f4f6;
-  outline: none;
-}
-
-.select-base__option--selected.select-base__option--highlighted {
-  background-color: #ddd6fe;
-}
-
 .select-base__option-checkbox {
   margin-right: 8px;
   cursor: pointer;

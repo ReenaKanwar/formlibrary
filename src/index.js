@@ -13,4 +13,3 @@ export { FileField }   from './components/fields/FileField';
 export { DateField }   from './components/fields/DateField';
 export { NumberField } from './components/fields/NumberField';
 export { RepeatableGroup } from './components/fields/RepeatableGroup';
-export { TypeAheadField } from './components/fields/TypeAheadField';

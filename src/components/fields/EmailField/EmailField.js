@@ -1,9 +1,9 @@
 import './EmailField.css';
 import { BaseField } from '../BaseField';
 
-export function EmailField({ label, required, errorMessage, value, onChange, formStyles = {}, className, style, labelStyle, labelGap, disabled, size }) {
+export function EmailField({ label, required, errorMessage, value, onChange, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
   return (
-    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap} size={size}>
+    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       <input
         className={`email-field__input ${className || ''}`}
         type="email"

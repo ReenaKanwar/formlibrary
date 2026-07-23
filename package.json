@@ -27,8 +27,7 @@
       "import": "./dist/skemvora.es.js",
       "require": "./dist/skemvora.umd.js"
     },
-    "./style.css": "./dist/styles.css",
-    "./styles.css": "./dist/styles.css"
+    "./style.css": "./dist/style.css"
   },
   "sideEffects": [
     "*.css"

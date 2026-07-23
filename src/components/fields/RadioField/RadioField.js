@@ -1,9 +1,9 @@
 import './RadioField.css';
 import { BaseField } from '../BaseField';
 
-export function RadioField({ label, required, errorMessage, value, onChange, options, name, formStyles = {}, className, style, labelStyle, labelGap, disabled, size }) {
+export function RadioField({ label, required, errorMessage, value, onChange, options, name, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
   return (
-    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap} size={size}>
+    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       <div className={`radio-field__options ${className || ''}`} style={style || {}}>
         {options && options.map((option) => (
           <label key={option.value || option} className="radio-field__option-label" style={formStyles.label || {}}>

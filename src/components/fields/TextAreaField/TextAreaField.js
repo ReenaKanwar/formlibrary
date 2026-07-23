@@ -1,9 +1,9 @@
 import './TextAreaField.css';
 import { BaseField } from '../BaseField';
 
-export function TextAreaField({ label, required, errorMessage, value, onChange, placeholder, rows = 4, formStyles = {}, className, style, labelStyle, labelGap, disabled, size }) {
+export function TextAreaField({ label, required, errorMessage, value, onChange, placeholder, rows = 4, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
   return (
-    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap} size={size}>
+    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       <textarea
         className={`textarea-field__input ${className || ''}`}
         value={value}

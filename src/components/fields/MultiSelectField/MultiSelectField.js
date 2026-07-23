@@ -18,7 +18,6 @@ export function MultiSelectField({
   searchable,
   maxSelection,
   placeholder,
-  size,
 }) {
   const selectedValues = Array.isArray(value) ? value : (value ? [value] : []);
 
@@ -87,7 +86,6 @@ export function MultiSelectField({
       formStyles={formStyles}
       labelStyle={labelStyle}
       labelGap={labelGap}
-      size={size}
     >
       <SelectBase
         options={options}

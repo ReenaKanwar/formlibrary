@@ -1,9 +1,9 @@
 import './FileField.css';
 import { BaseField } from '../BaseField';
 
-export function FileField({ label, required, errorMessage, onChange, accept, formStyles = {}, className, style, labelStyle, labelGap, disabled, size }) {
+export function FileField({ label, required, errorMessage, onChange, accept, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
   return (
-    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap} size={size}>
+    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       <input
         className={`file-field__input ${className || ''}`}
         type="file"

@@ -29,11 +29,5 @@ export function resolveInitialValue(field, initialValues) {
     return false;
   }
 
-  // Slider defaults to min or 0
-  if (field.type === 'slider') {
-    const minVal = field.min !== undefined ? Number(field.min) : 0;
-    return minVal;
-  }
-
   return '';
 }

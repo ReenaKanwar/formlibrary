@@ -3,7 +3,7 @@ import { BaseField } from '../BaseField';
 import { fieldMapper } from '../../../utils/fieldMapper';
 import { normalizeGrid } from '../../../utils/normalizeGrid';
 import { evaluateCondition } from '../../../utils/conditionEvaluator';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 export function RepeatableGroup(props) {
   const {
@@ -11,8 +11,7 @@ export function RepeatableGroup(props) {
     formStyles = {}, labelGap, labelStyle, disabled,
     name, value, onChange, fields = [],
     minItems = 0, maxItems = Infinity,
-    addButtonText = 'Add', addControl, removeControl,
-    size
+    addButtonText = 'Add', addControl, removeControl
   } = props;
 
   let currentValues = Array.isArray(value) ? value : [];
@@ -23,22 +22,21 @@ export function RepeatableGroup(props) {
   }
 
   // ─── stable keys for nested components with state ────────────────────
-  // We maintain a ref map so we can assign stable UUIDs per slot without
-  // ever mutating state during render (which causes infinite re-render loops).
-  const keyPoolRef = useRef([]);
+  const [rowKeys, setRowKeys] = useState(() => currentValues.map(() => crypto.randomUUID()));
 
-  // Grow the pool if we have more rows than keys
-  while (keyPoolRef.current.length < currentValues.length) {
-    keyPoolRef.current.push(crypto.randomUUID());
-  }
-  // Shrink the pool when rows are removed
-  if (keyPoolRef.current.length > currentValues.length) {
-    keyPoolRef.current = keyPoolRef.current.slice(0, currentValues.length);
-  }
-
-  // A simple counter-state to force re-render when rows change
-  const [, forceRender] = useState(0);
-  const bump = useCallback(() => forceRender(n => n + 1), []);
+  useEffect(() => {
+    // Sync rowKeys length if currentValues changes externally
+    if (currentValues.length !== rowKeys.length) {
+      setRowKeys(prev => {
+        if (currentValues.length > prev.length) {
+          const newKeys = Array(currentValues.length - prev.length).fill(0).map(() => crypto.randomUUID());
+          return [...prev, ...newKeys];
+        } else {
+          return prev.slice(0, currentValues.length);
+        }
+      });
+    }
+  }, [currentValues.length]);
 
   // ─── position helpers ────────────────────────────────────────────────
   const addPos    = addControl?.position    || 'footer-right';
@@ -48,16 +46,14 @@ export function RepeatableGroup(props) {
   const handleAdd = (e) => {
     if (e) e.preventDefault();
     if (currentValues.length >= maxItems) return;
-    keyPoolRef.current.push(crypto.randomUUID());
-    bump();
+    setRowKeys(prev => [...prev, crypto.randomUUID()]);
     onChange([...currentValues, {}]);
   };
 
   const handleRemove = (index, e) => {
     if (e) e.preventDefault();
     if (currentValues.length <= minItems) return;
-    keyPoolRef.current.splice(index, 1);
-    bump();
+    setRowKeys(prev => prev.filter((_, i) => i !== index));
     const next = [...currentValues];
     next.splice(index, 1);
     onChange(next);
@@ -160,10 +156,12 @@ export function RepeatableGroup(props) {
   };
 
   // ─── positional add-control wrappers ─────────────────────────────────
+  // Each wrapper is a full-width flex row with alignment driven by CSS class.
   const renderAddArea = (position) => {
     if (addPos !== position) return null;
     const btn = renderAddBtn();
     if (!btn) return null;
+    // Map position → CSS modifier
     const mod = position === 'header-left'   ? 'left'
                : position === 'header-right'  ? 'right'
                : position === 'footer-left'   ? 'left'
@@ -190,6 +188,7 @@ export function RepeatableGroup(props) {
         </div>
       );
     }
+    // default: block-header-right — title left, remove right
     return (
       <div className="repeatable-group__block-header repeatable-group__block-header--remove-right">
         {title}
@@ -207,7 +206,6 @@ export function RepeatableGroup(props) {
       formStyles={formStyles}
       labelStyle={labelStyle}
       labelGap={labelGap}
-      size={size}
     >
       <div className={`repeatable-group ${className || ''}`.trim()} style={style}>
 
@@ -221,11 +219,8 @@ export function RepeatableGroup(props) {
             const blockErrors = (typeof errorMessage === 'object' && errorMessage !== null)
               ? errorMessage[index] : {};
 
-            // Use stable key from pool for this row slot
-            const rowKey = keyPoolRef.current[index] || index;
-
             return (
-              <div key={rowKey} className="repeatable-group__block">
+              <div key={rowKeys[index] || index} className="repeatable-group__block">
 
                 {renderBlockHeader(index)}
 
@@ -252,14 +247,20 @@ export function RepeatableGroup(props) {
                     return (
                       <div key={fIndex} className={gridClasses}>
                         <FieldComponent
-                          {...fieldConfig}
                           name={fKey}
+                          label={fieldConfig.label}
+                          required={fieldConfig.required}
+                          options={fieldConfig.options}
                           value={blockValue[fKey] !== undefined ? blockValue[fKey] : ''}
                           checked={!!blockValue[fKey]}
                           onChange={(e) => handleNestedChange(index, fieldConfig, e)}
                           errorMessage={blockErrors ? blockErrors[fKey] : undefined}
                           formStyles={formStyles}
+                          className={fieldConfig.className}
+                          style={fieldConfig.style}
+                          labelStyle={fieldConfig.labelStyle}
                           labelGap={formStyles.labelGap}
+                          size={fieldConfig.size}
                           disabled={disabled || !!fieldConfig.disabled}
                         />
                       </div>

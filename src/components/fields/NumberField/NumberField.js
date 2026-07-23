@@ -1,7 +1,7 @@
 import './NumberField.css';
 import { BaseField } from '../BaseField';
 
-export function NumberField({ label, required, errorMessage, value, onChange, placeholder, min, max, step, maxDigits, precision, prefix, suffix, prefixStyle, suffixStyle, formStyles = {}, className, style, labelStyle, labelGap, disabled, size }) {
+export function NumberField({ label, required, errorMessage, value, onChange, placeholder, min, max, step, maxDigits, precision, prefix, suffix, prefixStyle, suffixStyle, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
   const handleInputChange = (e) => {
     const val = e.target.value;
     if (val) {
@@ -26,7 +26,7 @@ export function NumberField({ label, required, errorMessage, value, onChange, pl
   const baseInputStyle = { ...(formStyles.input || {}), ...(style || {}) };
 
   return (
-    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap} size={size}>
+    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       {(prefix || suffix) ? (
         <div className={`prefix-suffix-wrapper ${prefix ? 'has-prefix' : ''} ${suffix ? 'has-suffix' : ''} ${disabled ? 'is-disabled' : ''} ${className || ''}`} style={baseInputStyle}>
           {prefix && <span className="field-prefix" style={mergedPrefixStyle}>{prefix}</span>}

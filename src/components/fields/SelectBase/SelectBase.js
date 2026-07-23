@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './SelectBase.css';
 
 /**
@@ -7,8 +7,6 @@ import './SelectBase.css';
  *
  * For TypeAhead: pass isTypeAhead=true. The trigger becomes a plain
  * text input; the dropdown opens only when the user types.
- *
- * Task 43: Full keyboard navigation (ArrowUp/Down, Enter, Escape).
  */
 export function SelectBase({
   options = [],
@@ -33,43 +31,10 @@ export function SelectBase({
   disabled,
   placeholder,
 }) {
-  const [isOpen, setIsOpen]             = useState(false);
-  const [searchTerm, setSearchTerm]     = useState('');
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
-
-  const containerRef   = useRef(null);
+  const [isOpen, setIsOpen]       = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const containerRef  = useRef(null);
   const searchInputRef = useRef(null);
-  const listRef        = useRef(null);
-
-  /* ── Filter options locally unless parent handles it (async) ── */
-  const filteredOptions = useMemo(() => {
-    if (onSearchChange) return options;            // parent filters async results
-    return options.filter(opt => {
-      if (!searchable || !searchTerm) return true;
-      const lbl = typeof opt === 'object' ? opt.label : opt;
-      return String(lbl).toLowerCase().includes(searchTerm.toLowerCase());
-    });
-  }, [options, onSearchChange, searchable, searchTerm]);
-
-  /* ── Reset/set highlighted index when dropdown opens/closes or options change ── */
-  useEffect(() => {
-    if (!isOpen) {
-      setHighlightedIndex(-1);
-    } else {
-      setHighlightedIndex(filteredOptions.length > 0 ? 0 : -1);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, filteredOptions.length]);
-
-  /* ── Auto-scroll highlighted option into view ── */
-  useEffect(() => {
-    if (highlightedIndex >= 0 && listRef.current) {
-      const activeEl = listRef.current.children[highlightedIndex];
-      if (activeEl) {
-        activeEl.scrollIntoView({ block: 'nearest' });
-      }
-    }
-  }, [highlightedIndex]);
 
   /* ── Close on outside click ── */
   useEffect(() => {
@@ -91,8 +56,8 @@ export function SelectBase({
   }, [isOpen, searchable, isTypeAhead]);
 
   /* ── Helpers ── */
-  const openDropdown   = () => { if (!disabled) setIsOpen(true); };
-  const closeDropdown  = () => setIsOpen(false);
+  const openDropdown  = () => { if (!disabled) setIsOpen(true);  };
+  const closeDropdown = () => setIsOpen(false);
   const toggleDropdown = () => {
     if (disabled) return;
     if (isOpen) closeDropdown();
@@ -124,63 +89,32 @@ export function SelectBase({
   };
 
   const handleOptionClick = (option) => {
-    const value = typeof option === 'object' ? option.value : option;
+    const value    = typeof option === 'object' ? option.value : option;
     if (isMulti) {
       if (selectedValues.includes(value)) {
         if (onDeselect) onDeselect(value);
       } else {
         if (!maxSelection || selectedValues.length < maxSelection) {
-          if (onSelect) onSelect(value, option);
+          if (onSelect) onSelect(value);
         }
       }
       // keep dropdown open for multi
     } else {
-      if (onSelect) onSelect(value, option);
+      if (onSelect) onSelect(value);
       closeDropdown();
       setSearchTerm('');
+      if (onSearchChange) onSearchChange('');
     }
   };
 
-  /* ── Task 43: Keyboard navigation handler ── */
-  const handleKeyDown = (e) => {
-    if (disabled) return;
-
-    if (!isOpen) {
-      // Open dropdown on ArrowDown / ArrowUp when closed
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        openDropdown();
-        if (isTypeAhead && onSearchChange) {
-          onSearchChange(searchTerm);
-        }
-      }
-      return;
-    }
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setHighlightedIndex(prev => {
-        if (filteredOptions.length === 0) return -1;
-        const next = prev + 1;
-        return next >= filteredOptions.length ? 0 : next;
+  /* ── Filter options locally unless parent handles it (async) ── */
+  const filteredOptions = onSearchChange
+    ? options
+    : options.filter(opt => {
+        if (!searchable || !searchTerm) return true;
+        const lbl = typeof opt === 'object' ? opt.label : opt;
+        return String(lbl).toLowerCase().includes(searchTerm.toLowerCase());
       });
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setHighlightedIndex(prev => {
-        if (filteredOptions.length === 0) return -1;
-        const next = prev - 1;
-        return next < 0 ? filteredOptions.length - 1 : next;
-      });
-    } else if (e.key === 'Enter') {
-      if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
-        e.preventDefault();
-        handleOptionClick(filteredOptions[highlightedIndex]);
-      }
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      closeDropdown();
-    }
-  };
 
   const showClearBtn = isClearable && selectedValues.length > 0 && !disabled;
 
@@ -201,7 +135,6 @@ export function SelectBase({
     <div
       className={`select-base__container${disabled ? ' select-base--disabled' : ''}${className ? ' ' + className : ''}`}
       ref={containerRef}
-      onKeyDown={handleKeyDown}
     >
       {/* ── TRIGGER ── */}
       {isTypeAhead ? (
@@ -213,14 +146,6 @@ export function SelectBase({
             placeholder={placeholder || searchPlaceholder}
             value={typeAheadInputValue}
             onChange={handleTypeAheadInputChange}
-            onFocus={() => {
-              if (isTypeAhead) {
-                openDropdown();
-                if (onSearchChange && !selectedValues.length) {
-                  onSearchChange(searchTerm);
-                }
-              }
-            }}
             disabled={disabled}
             autoComplete="off"
           />
@@ -237,19 +162,7 @@ export function SelectBase({
         </div>
       ) : (
         /* Select / MultiSelect: click-to-open trigger */
-        <div
-          className="select-base__trigger"
-          style={inputStyle}
-          onClick={toggleDropdown}
-          tabIndex={disabled ? -1 : 0}
-          onKeyDown={(e) => {
-            // Enter/Space open the dropdown when the trigger div is focused
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              toggleDropdown();
-            }
-          }}
-        >
+        <div className="select-base__trigger" style={inputStyle} onClick={toggleDropdown}>
           <div className="select-base__trigger-content-wrapper">
             {renderCustomTrigger ? renderCustomTrigger() : (
               <div className={`select-base__trigger-text${!selectedValues.length ? ' select-base__placeholder' : ''}`}>
@@ -286,25 +199,19 @@ export function SelectBase({
               />
             </div>
           )}
-          <ul className="select-base__options-list" ref={listRef}>
+          <ul className="select-base__options-list">
             {isLoading ? (
               <li className="select-base__loading">Loading...</li>
             ) : filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => {
-                const optValue     = typeof option === 'object' ? option.value : option;
-                const optLabel     = typeof option === 'object' ? option.label : option;
-                const isSelected   = selectedValues.includes(optValue);
-                const isHighlighted = index === highlightedIndex;
+                const optValue   = typeof option === 'object' ? option.value : option;
+                const optLabel   = typeof option === 'object' ? option.label : option;
+                const isSelected = selectedValues.includes(optValue);
                 return (
                   <li
-                    key={optValue !== undefined ? optValue : index}
-                    className={[
-                      'select-base__option',
-                      isSelected   ? 'select-base__option--selected'    : '',
-                      isHighlighted ? 'select-base__option--highlighted' : '',
-                    ].filter(Boolean).join(' ')}
+                    key={index}
+                    className={`select-base__option${isSelected ? ' select-base__option--selected' : ''}`}
                     onMouseDown={(e) => e.preventDefault()} // prevent blur before click
-                    onMouseEnter={() => setHighlightedIndex(index)}
                     onClick={() => handleOptionClick(option)}
                     style={{ ...(formStyles.option || {}), ...(isSelected ? (formStyles.selectedOption || {}) : {}) }}
                   >

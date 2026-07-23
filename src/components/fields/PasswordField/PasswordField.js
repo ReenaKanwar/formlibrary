@@ -1,9 +1,9 @@
 import './PasswordField.css';
 import { BaseField } from '../BaseField';
 
-export function PasswordField({ label, required, errorMessage, value, onChange, placeholder, formStyles = {}, className, style, labelStyle, labelGap, disabled, size }) {
+export function PasswordField({ label, required, errorMessage, value, onChange, placeholder, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
   return (
-    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap} size={size}>
+    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
       <input
         className={`password-field__input ${className || ''}`}
         type="password"
