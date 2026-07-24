@@ -61,7 +61,7 @@
   border: none;
   outline: none;
   background: transparent;
-  font-size: 14px;
+  font-size: inherit;
   color: #111827;
   padding: 0;
   width: 100%;

@@ -11,7 +11,8 @@ export function RepeatableGroup(props) {
     formStyles = {}, labelGap, labelStyle, disabled,
     name, value, onChange, fields = [],
     minItems = 0, maxItems = Infinity,
-    addButtonText = 'Add', addControl, removeControl
+    addButtonText = 'Add', addControl, removeControl,
+    size
   } = props;
 
   let currentValues = Array.isArray(value) ? value : [];
@@ -206,6 +207,7 @@ export function RepeatableGroup(props) {
       formStyles={formStyles}
       labelStyle={labelStyle}
       labelGap={labelGap}
+      size={size}
     >
       <div className={`repeatable-group ${className || ''}`.trim()} style={style}>
 
@@ -247,20 +249,14 @@ export function RepeatableGroup(props) {
                     return (
                       <div key={fIndex} className={gridClasses}>
                         <FieldComponent
+                          {...fieldConfig}
                           name={fKey}
-                          label={fieldConfig.label}
-                          required={fieldConfig.required}
-                          options={fieldConfig.options}
                           value={blockValue[fKey] !== undefined ? blockValue[fKey] : ''}
                           checked={!!blockValue[fKey]}
                           onChange={(e) => handleNestedChange(index, fieldConfig, e)}
                           errorMessage={blockErrors ? blockErrors[fKey] : undefined}
                           formStyles={formStyles}
-                          className={fieldConfig.className}
-                          style={fieldConfig.style}
-                          labelStyle={fieldConfig.labelStyle}
                           labelGap={formStyles.labelGap}
-                          size={fieldConfig.size}
                           disabled={disabled || !!fieldConfig.disabled}
                         />
                       </div>

@@ -1,9 +1,9 @@
 import './CheckboxField.css';
 import { BaseField } from '../BaseField';
 
-export function CheckboxField({ label, required, errorMessage, checked, onChange, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
+export function CheckboxField({ label, required, errorMessage, checked, onChange, formStyles = {}, className, style, labelStyle, labelGap, disabled, size }) {
   return (
-    <BaseField label="" required={false} errorMessage={errorMessage} formStyles={formStyles} labelGap={labelGap}>
+    <BaseField label="" required={false} errorMessage={errorMessage} formStyles={formStyles} labelGap={labelGap} size={size}>
       <label className={`checkbox-field__container ${className || ''}`} style={style || {}}>
         <input
           className="checkbox-field__input"

@@ -1,7 +1,7 @@
 import './CheckboxGroupField.css';
 import { BaseField } from '../BaseField';
 
-export function CheckboxGroupField({ label, required, errorMessage, value = [], onChange, options, name, formStyles = {}, className, style, labelStyle, labelGap, disabled }) {
+export function CheckboxGroupField({ label, required, errorMessage, value = [], onChange, options, name, formStyles = {}, className, style, labelStyle, labelGap, disabled, size }) {
   const handleCheckboxChange = (e, optionValue) => {
     if (disabled) return;
     const isChecked = e.target.checked;
@@ -21,7 +21,7 @@ export function CheckboxGroupField({ label, required, errorMessage, value = [], 
   };
 
   return (
-    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap}>
+    <BaseField label={label} required={required} errorMessage={errorMessage} formStyles={formStyles} labelStyle={labelStyle} labelGap={labelGap} size={size}>
       <div className={`checkbox-group-field__options ${className || ''}`} style={style || {}}>
         {options && options.map((option) => {
           const optValue = option.value || option;

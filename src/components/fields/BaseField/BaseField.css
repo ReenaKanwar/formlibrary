@@ -38,7 +38,7 @@
 /* Small */
 .base-field--size-small .base-field__label { font-size: 12px; }
 .base-field--size-small .text-field__input,
-.base-field--size-small .select-base__control,
+.base-field--size-small .select-base__trigger,
 .base-field--size-small .inner-input,
 .base-field--size-small .textarea-field__input,
 .base-field--size-small .date-field__input,
@@ -62,7 +62,7 @@
 /* Large */
 .base-field--size-large .base-field__label { font-size: 16px; }
 .base-field--size-large .text-field__input,
-.base-field--size-large .select-base__control,
+.base-field--size-large .select-base__trigger,
 .base-field--size-large .inner-input,
 .base-field--size-large .textarea-field__input,
 .base-field--size-large .date-field__input,

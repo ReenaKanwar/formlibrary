@@ -19,6 +19,7 @@ export function TypeAheadField({
   minSearchLength = 1,
   isClearable = true,
   placeholder,
+  size,
 }) {
   const [asyncOptions, setAsyncOptions]   = useState([]);
   const [isLoading, setIsLoading]         = useState(false);
@@ -134,6 +135,7 @@ export function TypeAheadField({
       formStyles={formStyles}
       labelStyle={labelStyle}
       labelGap={labelGap}
+      size={size}
     >
       <SelectBase
         isTypeAhead={true}
