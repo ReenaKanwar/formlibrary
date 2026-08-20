@@ -5,6 +5,25 @@
   width: 100%;
 }
 
+.conditional-form-wrapper.conditional-form-align-center {
+  margin: 0 auto;
+}
+
+.conditional-form-wrapper.conditional-form-align-right {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.conditional-form-wrapper.conditional-form-align-left {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.conditional-form-wrapper.conditional-form-align-stretch .form-grid-item {
+  display: flex;
+  flex-direction: column;
+}
+
 .conditional-form-submit-btn-wrapper {
   grid-column: span 12 / span 12;
   display: flex;
@@ -30,4 +49,3 @@
 /* --- Global Form Size Overrides (Task 45) --- */
 .conditional-form-wrapper--size-small .conditional-form-submit-btn { padding: 8px 16px; font-size: 13px; }
 .conditional-form-wrapper--size-large .conditional-form-submit-btn { padding: 14px 24px; font-size: 16px; }
-

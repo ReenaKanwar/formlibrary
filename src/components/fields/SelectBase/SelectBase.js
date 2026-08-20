@@ -8,7 +8,7 @@ import './SelectBase.css';
  * For TypeAhead: pass isTypeAhead=true. The trigger becomes a plain
  * text input; the dropdown opens only when the user types.
  */
-export function SelectBase({
+export function SelectBase({ labelPosition, labelWidth, labelAlign, labelVariant, fieldVariant, width, minWidth, maxWidth, 
   options = [],
   isMulti = false,
   searchable = false,

@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 
 export function RepeatableGroup(props) {
   const {
+    labelPosition, labelWidth, labelAlign, labelVariant, fieldVariant, width, minWidth, maxWidth,
     label, required, errorMessage, className, style,
     formStyles = {}, labelGap, labelStyle, disabled,
     name, value, onChange, fields = [],
@@ -208,7 +209,7 @@ export function RepeatableGroup(props) {
       labelStyle={labelStyle}
       labelGap={labelGap}
       size={size}
-    >
+     labelPosition={labelPosition} labelWidth={labelWidth} labelAlign={labelAlign} labelVariant={labelVariant} fieldVariant={fieldVariant} width={width} minWidth={minWidth} maxWidth={maxWidth} hasValue={!!value || (Array.isArray(value) && value.length > 0)}>
       <div className={`repeatable-group ${className || ''}`.trim()} style={style}>
 
         {/* Header add-control area */}

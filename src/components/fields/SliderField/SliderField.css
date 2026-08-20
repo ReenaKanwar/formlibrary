@@ -27,10 +27,144 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Rating Variant */
+.slider-field__rating-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.slider-field__star {
+  position: relative;
+  font-size: 28px;
+  color: #d1d5db;
+  cursor: pointer;
+  user-select: none;
+  line-height: 1;
+}
+
+.slider-field__star.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.slider-field__star.filled {
+  color: #fbbf24;
+}
+
+.slider-field__star.half {
+  color: #fbbf24;
+  /* Use a background clip trick or just assume SVG. With text ★, we can clip */
+}
+.slider-field__star.half .slider-field__star-full {
+  color: #d1d5db; /* full star is grey */
+}
+.slider-field__star.half::before {
+  content: '★';
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #fbbf24;
+  overflow: hidden;
+  width: 50%;
+}
+
+.slider-field__star-half-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 2;
+}
+
+.slider-field__star-full {
+  position: relative;
+  z-index: 1;
+}
+
+.slider-field__star-full.has-half {
+  /* No special styles needed, left half intercepts hover */
+}
+
+/* Icons Variant */
+.slider-field__icons-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.slider-field__icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.slider-field__icon-item:hover:not(.disabled) {
+  border-color: #a5b4fc;
+  background-color: #eef2ff;
+}
+
+.slider-field__icon-item.selected {
+  border-color: #4f46e5;
+  background-color: #eef2ff;
+  box-shadow: 0 0 0 1px #4f46e5;
+}
+
+.slider-field__icon-item.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.slider-field__icon-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.slider-field__icon-label {
+  font-size: 12px;
+  color: #4b5563;
+  font-weight: 500;
+  text-align: center;
+}
+
 /* Sizing overrides inherited from BaseField */
 .base-field--size-small .slider-field__value-display {
   font-size: 12px;
 }
+.base-field--size-small .slider-field__star {
+  font-size: 20px;
+}
+.base-field--size-small .slider-field__icon-emoji {
+  font-size: 18px;
+}
+.base-field--size-small .slider-field__icon-item {
+  padding: 6px 8px;
+}
+.base-field--size-small .slider-field__icon-label {
+  font-size: 11px;
+}
+
 .base-field--size-large .slider-field__value-display {
   font-size: 16px;
+}
+.base-field--size-large .slider-field__star {
+  font-size: 36px;
+}
+.base-field--size-large .slider-field__icon-emoji {
+  font-size: 32px;
+}
+.base-field--size-large .slider-field__icon-item {
+  padding: 12px 16px;
+}
+.base-field--size-large .slider-field__icon-label {
+  font-size: 14px;
 }
