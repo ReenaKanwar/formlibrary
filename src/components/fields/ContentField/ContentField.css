@@ -23,3 +23,31 @@
   color: #4b5563;
   margin: 0;
 }
+
+/* --- Task 49: Section Support --- */
+.content-field-section {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.content-field-section__heading {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.content-field-section__description {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.content-field-section__divider {
+  border: 0;
+  height: 1px;
+  background-color: #e5e7eb;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}

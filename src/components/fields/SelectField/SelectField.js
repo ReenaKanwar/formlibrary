@@ -1,7 +1,7 @@
 import { BaseField } from '../BaseField';
 import { SelectBase } from '../SelectBase';
 
-export function SelectField({
+export function SelectField({ labelPosition, labelWidth, labelAlign, labelVariant, fieldVariant, width, minWidth, maxWidth, 
   label,
   required,
   errorMessage,
@@ -31,7 +31,7 @@ export function SelectField({
       labelStyle={labelStyle}
       labelGap={labelGap}
       size={size}
-    >
+     labelPosition={labelPosition} labelWidth={labelWidth} labelAlign={labelAlign} labelVariant={labelVariant} fieldVariant={fieldVariant} width={width} minWidth={minWidth} maxWidth={maxWidth} hasValue={!!value || (Array.isArray(value) && value.length > 0)}>
       <SelectBase
         options={options}
         isMulti={false}

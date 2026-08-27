@@ -3238,6 +3238,585 @@ Run `my-test-ui-app` and ensure every new feature behaves correctly without brea
 
 ---
 
+### Task 47 — Add Password Visibility Toggle
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 46
+
+**Objective:**
+Enhance the PasswordField component by adding a built-in password visibility toggle, allowing users to view or hide their entered password.
+
+**Requirements:**
+
+* Display an eye icon inside the password field on the right side.
+* By default, the password should remain hidden (`type="password"`).
+* Clicking the eye icon should change the field to `type="text"`.
+* Clicking it again should hide the password.
+* The icon should visually indicate the current state (show / hide).
+* The icon should be positioned inside the input without affecting the existing layout.
+* It should respect:
+  * `disabled`
+  * `readOnly` (if supported)
+  * `size` (small / medium / large)
+  * global `formStyles`
+  * inline `style`
+  * `className`
+
+**Styling Requirements:**
+
+* The icon should scale according to the field size.
+* It should align properly with prefix/suffix if those are present.
+* It should inherit the existing input styling system.
+* Users should be able to customize icon color through global styling and inline styling.
+
+**Acceptance Criteria:**
+
+* Password visibility toggles correctly.
+* Existing PasswordField API remains unchanged.
+* Validation continues working.
+* Form submission remains unchanged.
+* Works correctly in both `Form` and `ConditionalForm`.
+* Works inside `RepeatableGroup`.
+
+---
+
+### Task 48 — Enhance SliderField with Proper Range Support and Variants
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 47
+
+**Objective:**
+Improve the existing SliderField implementation by fixing current issues and supporting multiple display variants.
+
+#### Part 1 — Fix Existing Slider
+
+**Current Issue:**
+
+The SliderField is not correctly respecting:
+
+* `min`
+* `max`
+
+These should be fully implemented.
+
+**Requirements:**
+
+Support:
+
+* `min`
+* `max`
+* `step`
+* `defaultValue`
+* `disabled`
+* `required`
+* `size`
+* `grid`
+* `condition`
+* `style`
+* `className`
+
+The selected value must always remain within the defined range.
+
+**Example:**
+```js
+{
+    label: "Experience",
+    name: "experience",
+    type: "slider",
+    min: 0,
+    max: 10,
+    step: 1
+}
+```
+
+#### Part 2 — Rating Variant
+
+Add support for a rating variant using stars.
+
+**Example:**
+```js
+{
+    label: "Rate our service",
+    name: "rating",
+    type: "slider",
+    variant: "rating",
+    max: 5,
+    allowHalf: true
+}
+```
+
+**Requirements:**
+
+* Display stars instead of a traditional slider.
+* Support half-star selection.
+* Support decimal values such as:
+  * 0.5
+  * 1.5
+  * 2.5
+  * 3.5
+  * 4.5
+* Highlight only half the star for `.5` values.
+* Store the selected numeric value.
+* Respect `disabled` state.
+* Respect `required` validation.
+* Support custom `max` values.
+
+#### Part 3 — Icon Rating Variant
+
+Support rating using custom icons instead of stars.
+
+**Example:**
+```js
+{
+    label: "Mood",
+    name: "mood",
+    type: "slider",
+    variant: "icons",
+
+    icons: [
+        {
+            icon: "😢",
+            value: 1,
+            label: "Very Sad"
+        },
+        {
+            icon: "😐",
+            value: 2,
+            label: "Neutral"
+        },
+        {
+            icon: "🙂",
+            value: 3,
+            label: "Happy"
+        },
+        {
+            icon: "😁",
+            value: 4,
+            label: "Very Happy"
+        },
+        {
+            icon: "🤩",
+            value: 5,
+            label: "Excellent"
+        }
+    ]
+}
+```
+
+**Requirements:**
+
+* Developers can provide any icons.
+* Each icon should have:
+  * `icon`
+  * `value`
+  * optional `label`
+* Clicking an icon selects its value.
+* Selected value is stored in form data.
+* Works with validation.
+* Works with `ConditionalForm`.
+* Works inside `RepeatableGroup`.
+* Users should be able to style icons using:
+  * `formStyles`
+  * inline `style`
+  * `className`
+
+**Future Architecture:**
+
+Design the SliderField so additional variants can easily be added later without changing the public API.
+
+Example future variants:
+
+* default slider
+* star rating
+* emoji rating
+* custom icon rating
+
+**Acceptance Criteria:**
+
+* Existing slider issues are fixed.
+* `min` / `max` work correctly.
+* Rating variant supports half-star values.
+* Icon variant supports developer-provided icons.
+* All variants work with `Form`, `ConditionalForm` and `RepeatableGroup`.
+* Submitted values are stored correctly.
+* Existing SliderField users are not affected.
+
+---
+
+### Testing — Verify Task 47 & Task 48 Features in Test App
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 47, Task 48
+
+**Objective:**
+Update `my-test-ui-app` with examples demonstrating all new features from Task 47 and Task 48.
+
+**Test App Examples:**
+
+1. Password field with show/hide toggle.
+2. Default SliderField.
+3. Slider with custom `min` / `max`.
+4. Star rating with half-star support.
+5. Emoji / icon rating example.
+6. Verify submitted data for every variant.
+
+**Verification:**
+
+Run `my-test-ui-app` and verify all examples manually after implementation.
+
+Do not stop after code changes.
+Ensure every new feature behaves correctly without breaking any existing functionality.
+
+**Acceptance Criteria:**
+
+* All six examples render and function correctly.
+* No regressions in existing test app examples.
+* All new features are demonstrated end-to-end.
+
+---
+
+### Task 49 — Enhance Form Layout and Styling System
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 48
+
+**Objective:**
+Enhance the existing Form and ConditionalForm components so developers can build professional-looking forms such as:
+
+* Contact Forms
+* Registration Forms
+* Login Forms
+* CRM Forms
+* Admin Panel Forms
+* Inquiry Forms
+* Enterprise Business Forms
+
+using only configuration and styling props, without writing custom CSS or creating custom layouts.
+
+The existing API should remain backward compatible.
+
+#### 1. Label Position
+
+Allow labels to be rendered in multiple positions.
+
+**Supported values:**
+
+* `top` (default)
+* `left`
+* `right`
+* `hidden`
+
+The feature must work globally through `formStyles` and individually for each field.
+
+**Example:**
+```js
+labelPosition: "left"
+```
+
+Field-level configuration should override global configuration.
+
+#### 2. Label Width
+
+When labels are displayed on the left or right, developers should be able to define a fixed label width.
+
+**Example:**
+```js
+labelWidth: "180px"
+```
+
+This ensures all fields remain perfectly aligned.
+
+**Support:**
+
+* Global configuration
+* Field-level override
+
+#### 3. Label Alignment
+
+**Support:**
+
+* `left`
+* `center`
+* `right`
+
+The alignment should work independently of label position.
+
+#### 4. Floating Labels
+
+Support floating labels similar to Material UI.
+
+The label starts inside the field. When the user:
+
+* focuses the field
+* types a value
+* field has an initial value
+
+the label should animate above the field.
+
+**Requirements:**
+
+* Smooth transition
+* Required indicator continues working
+* Works with validation
+* Works with disabled fields
+* Works with readOnly fields
+
+#### 5. Label Variants
+
+Support different label styles.
+
+**Initial variants:**
+
+* `standard`
+* `floating`
+* `outlined`
+
+The architecture should allow additional variants in the future.
+
+#### 6. Input Variants
+
+Support multiple input appearance styles.
+
+**Variants:**
+
+* `outlined` (default)
+* `filled`
+* `standard`
+
+All supported field types should respect these variants whenever applicable.
+
+#### 7. Responsive Label Position
+
+Allow different label positions based on screen size.
+
+**Example:**
+
+* Desktop: Label on left
+* Tablet: Label on top
+* Mobile: Label on top
+
+This should integrate with the existing responsive styling system.
+
+#### 8. Label Gap
+
+Allow configuring spacing between the label and the field.
+
+**Example:**
+```js
+labelGap: "12px"
+```
+
+**Support:**
+
+* Global
+* Field-level override
+
+#### 9. Field Gap
+
+Allow configuring spacing between consecutive fields.
+
+**Support:**
+
+* Global
+* Responsive spacing
+
+#### 10. Form Alignment
+
+Allow developers to control overall form alignment.
+
+**Support:**
+
+* `left`
+* `center`
+* `right`
+* `stretch`
+
+Useful for login forms and centered registration forms.
+
+#### 11. Input Width Control
+
+Allow developers to control field width independent of grid.
+
+**Examples:**
+```js
+width: "100%"
+width: "400px"
+maxWidth
+minWidth
+```
+
+Useful for login forms and compact layouts.
+
+#### 12. Form Width
+
+Allow configuring the overall form width.
+
+**Examples:**
+
+* `400px`
+* `600px`
+* `800px`
+* `100%`
+
+This should work together with grid.
+
+#### 13. Section Support
+
+Improve support for creating visually separated form sections.
+
+Since the library already supports Content fields, enhance them to allow:
+
+* Section Heading
+* Section Description
+* Divider below heading
+* Custom spacing before and after section
+
+**Example:**
+```
+Personal Information
+------------------------
+First Name
+Last Name
+
+Contact Details
+------------------------
+Email
+Phone
+```
+
+#### 14. Better Field Alignment
+
+Ensure every supported field maintains consistent:
+
+* height
+* padding
+* label spacing
+* border radius
+* helper text spacing
+* error message spacing
+
+This should include:
+
+* Text
+* Email
+* Password
+* Number
+* Date
+* Select
+* MultiSelect
+* TypeAhead
+* TextArea
+* Checkbox
+* CheckboxGroup
+* Radio
+* Slider
+* File
+* RepeatableGroup
+
+#### 15. Global Layout Styles
+
+Expand `formStyles` to support layout configuration such as:
+
+* `formWidth`
+* `formAlignment`
+* `labelPosition`
+* `labelWidth`
+* `labelGap`
+* `labelAlign`
+* `fieldGap`
+* `sectionSpacing`
+* `fieldVariant`
+* `labelVariant`
+
+while maintaining compatibility with existing styling options.
+
+#### 16. Field-Level Overrides
+
+Every layout-related property should also be configurable per field.
+
+Field-level configuration should always override global settings.
+
+#### 17. Accessibility
+
+Ensure all new layout features maintain accessibility.
+
+**Verify:**
+
+* Label associations remain correct.
+* Keyboard navigation continues working.
+* Screen readers continue working.
+* Required indicators remain accessible.
+
+#### 18. Backward Compatibility
+
+All existing forms must continue working without any changes.
+
+None of the current APIs should break.
+
+All new features should be optional.
+
+**Acceptance Criteria:**
+
+Developers should be able to build forms similar to:
+
+* Material UI forms
+* Ant Design forms
+* Enterprise CRM forms
+* Contact Us pages
+* Inquiry forms
+* Login forms
+* Registration forms
+* Multi-step forms
+
+using only the library configuration and styling props.
+
+No custom CSS should be required for common layouts.
+
+---
+
+### Testing — Verify Task 49 Features in Test App
+
+**Status:** `[x] Done`
+
+**Depends On:** Task 49
+
+**Objective:**
+Update `my-test-ui-app` with demonstration pages for all new layout and styling features from Task 49.
+
+**Test App Examples:**
+
+1. Standard vertical form.
+2. Horizontal label form.
+3. Floating label form.
+4. Filled input variant.
+5. Standard input variant.
+6. Outlined input variant.
+7. Responsive form showing different layouts on desktop and mobile.
+8. Sectioned form using Content fields.
+9. Centered login form.
+10. Contact Us form similar to professional business websites.
+11. Enterprise data-entry form with left-aligned labels.
+
+**Verification:**
+
+Run `my-test-ui-app` and manually verify every layout.
+
+Ensure all previous examples continue to work without any regression.
+
+Do not stop after code changes.
+
+**Acceptance Criteria:**
+
+* All eleven examples render and function correctly.
+* No regressions in existing test app examples.
+* All new layout features are demonstrated end-to-end.
+
+---
+
 ## 📌 Task Dependency Map
 
 ```
@@ -3290,6 +3869,11 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
                                                                                                                   └── Task 45 (Add Field Size Support)
                                                                                                                        └── Task 46 (Create SliderField Component)
                                                                                                                             └── Testing (Verify All New Features)
+                                                                                                                            └── Task 47 (Add Password Visibility Toggle)
+                                                                                                                                 └── Task 48 (Enhance SliderField with Range & Variants)
+                                                                                                                                      └── Testing (Verify Task 47 & 48 Features)
+                                                                                                                                      └── Task 49 (Enhance Form Layout & Styling System)
+                                                                                                                                           └── Testing (Verify Task 49 Features)
 ```
 
 ---
@@ -3309,4 +3893,5 @@ Task 15 (Fields Folder Structure)      ← Phase 3 start
 
 ---
 
-*Last updated: 2026-06-08 | Conversation ID: 6d11314a-5f8a-4ff2-872e-2d1cab1bd633*
+*Last updated: 2026-08-07 | Conversation ID: 7dc2d794-bcb0-49a3-8e22-aea89ea8994f*
+

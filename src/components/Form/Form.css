@@ -5,6 +5,25 @@
   width: 100%;
 }
 
+.form-wrapper.form-align-center {
+  margin: 0 auto;
+}
+
+.form-wrapper.form-align-right {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.form-wrapper.form-align-left {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.form-wrapper.form-align-stretch .form-grid-item {
+  display: flex;
+  flex-direction: column;
+}
+
 .form-submit-btn-wrapper {
   grid-column: span 12 / span 12;
   display: flex;
@@ -29,4 +48,3 @@
 /* --- Global Form Size Overrides (Task 45) --- */
 .form-wrapper--size-small .form-submit-btn { padding: 8px 16px; font-size: 13px; }
 .form-wrapper--size-large .form-submit-btn { padding: 14px 24px; font-size: 16px; }
-

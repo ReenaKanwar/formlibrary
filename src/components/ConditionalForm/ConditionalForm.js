@@ -176,10 +176,25 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
         if (formStyles.grid.columnGap) containerStyle.columnGap = formStyles.grid.columnGap;
     }
 
+    // Task 49 Form Layout Styles
+    if (formStyles.formWidth) {
+        containerStyle.width = '100%';
+        containerStyle.maxWidth = formStyles.formWidth;
+    }
+    if (formStyles.fieldGap) {
+        containerStyle.gap = formStyles.fieldGap;
+    }
+    
+    let alignmentClass = '';
+    if (formStyles.formAlignment === 'center') alignmentClass = 'conditional-form-align-center';
+    else if (formStyles.formAlignment === 'right') alignmentClass = 'conditional-form-align-right';
+    else if (formStyles.formAlignment === 'left') alignmentClass = 'conditional-form-align-left';
+    else if (formStyles.formAlignment === 'stretch') alignmentClass = 'conditional-form-align-stretch';
+
     const resolvedSize = formStyles.size || 'medium';
 
     return (
-        <form className={`conditional-form-wrapper conditional-form-wrapper--size-${resolvedSize}`} onSubmit={handleFormSubmit} noValidate style={containerStyle}>
+        <form className={`conditional-form-wrapper conditional-form-wrapper--size-${resolvedSize} ${alignmentClass}`.trim()} onSubmit={handleFormSubmit} noValidate style={containerStyle}>
             {visibleFields.map((field, index) => {
                 const FieldComponent = fieldMapper[field.type];
 
@@ -228,7 +243,16 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
                             className={field.className}
                             style={field.style}
                             labelStyle={field.labelStyle}
-                            labelGap={formStyles.labelGap}
+                            labelGap={field.labelGap || formStyles.labelGap}
+                            labelPosition={field.labelPosition || formStyles.labelPosition}
+                            labelWidth={field.labelWidth || formStyles.labelWidth}
+                            labelAlign={field.labelAlign || formStyles.labelAlign}
+                            labelVariant={field.labelVariant || formStyles.labelVariant}
+                            fieldVariant={field.fieldVariant || formStyles.fieldVariant}
+                            width={field.width}
+                            minWidth={field.minWidth}
+                            maxWidth={field.maxWidth}
+                            sectionSpacing={field.sectionSpacing || formStyles.sectionSpacing}
                             disabled={!!field.disabled}
                             searchable={field.searchable}
                             maxSelection={field.maxSelection}
@@ -236,6 +260,11 @@ export function ConditionalForm({ data = [], onSubmit, onChange, formStyles = {}
                             minSearchLength={field.minSearchLength}
                             isClearable={field.isClearable}
                             placeholder={field.placeholder}
+                            min={field.min}
+                            max={field.max}
+                            step={field.step}
+                            allowHalf={field.allowHalf}
+                            icons={field.icons}
                         />
                     </div>
                 );

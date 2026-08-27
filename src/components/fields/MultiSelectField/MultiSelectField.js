@@ -2,7 +2,7 @@ import './MultiSelectField.css';
 import { BaseField } from '../BaseField';
 import { SelectBase } from '../SelectBase';
 
-export function MultiSelectField({
+export function MultiSelectField({ labelPosition, labelWidth, labelAlign, labelVariant, fieldVariant, width, minWidth, maxWidth, 
   label,
   required,
   errorMessage,
@@ -88,7 +88,7 @@ export function MultiSelectField({
       labelStyle={labelStyle}
       labelGap={labelGap}
       size={size}
-    >
+     labelPosition={labelPosition} labelWidth={labelWidth} labelAlign={labelAlign} labelVariant={labelVariant} fieldVariant={fieldVariant} width={width} minWidth={minWidth} maxWidth={maxWidth} hasValue={!!value || (Array.isArray(value) && value.length > 0)}>
       <SelectBase
         options={options}
         isMulti={true}

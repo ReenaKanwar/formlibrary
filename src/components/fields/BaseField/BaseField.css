@@ -3,6 +3,26 @@
   flex-direction: column;
   gap: 6px;
   width: 100%;
+  position: relative;
+}
+
+/* --- Label Positions --- */
+.base-field--label-left {
+  flex-direction: row;
+  align-items: center;
+}
+
+.base-field--label-right {
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.base-field__input-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  position: relative;
 }
 
 .base-field__label {
@@ -31,6 +51,105 @@
   opacity: 0.55;
   cursor: not-allowed;
   background-color: #f3f4f6;
+}
+
+/* --- Floating Labels --- */
+.base-field--label-variant-floating .base-field__label {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  background: white;
+  padding: 0 4px;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  font-size: 14px;
+  z-index: 1;
+  margin: 0;
+}
+
+.base-field--label-variant-floating:focus-within .base-field__label,
+.base-field--label-variant-floating.base-field--has-value .base-field__label {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
+  color: #4f46e5;
+  transform-origin: left top;
+}
+
+.base-field--label-variant-floating.base-field--size-large .base-field__label {
+  left: 16px;
+}
+
+.base-field--label-variant-floating.base-field--size-small .base-field__label {
+  left: 8px;
+}
+
+/* --- Input Variants --- */
+/* Filled */
+.base-field--field-variant-filled .text-field__input,
+.base-field--field-variant-filled .select-base__trigger,
+.base-field--field-variant-filled .textarea-field__input,
+.base-field--field-variant-filled .date-field__input,
+.base-field--field-variant-filled .number-field__input,
+.base-field--field-variant-filled .password-field__input,
+.base-field--field-variant-filled .email-field__input {
+  background-color: #f3f4f6;
+  border-color: transparent;
+  border-bottom: 2px solid #9ca3af;
+  border-radius: 6px 6px 0 0;
+}
+
+.base-field--field-variant-filled .text-field__input:focus,
+.base-field--field-variant-filled .select-base__trigger:focus,
+.base-field--field-variant-filled .textarea-field__input:focus,
+.base-field--field-variant-filled .date-field__input:focus,
+.base-field--field-variant-filled .number-field__input:focus,
+.base-field--field-variant-filled .password-field__input:focus,
+.base-field--field-variant-filled .email-field__input:focus {
+  border-bottom-color: #4f46e5;
+  background-color: #e5e7eb;
+}
+
+/* Standard */
+.base-field--field-variant-standard .text-field__input,
+.base-field--field-variant-standard .select-base__trigger,
+.base-field--field-variant-standard .textarea-field__input,
+.base-field--field-variant-standard .date-field__input,
+.base-field--field-variant-standard .number-field__input,
+.base-field--field-variant-standard .password-field__input,
+.base-field--field-variant-standard .email-field__input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid #d1d5db;
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.base-field--field-variant-standard .text-field__input:focus,
+.base-field--field-variant-standard .select-base__trigger:focus,
+.base-field--field-variant-standard .textarea-field__input:focus,
+.base-field--field-variant-standard .date-field__input:focus,
+.base-field--field-variant-standard .number-field__input:focus,
+.base-field--field-variant-standard .password-field__input:focus,
+.base-field--field-variant-standard .email-field__input:focus {
+  border-bottom-color: #4f46e5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .base-field--label-left,
+  .base-field--label-right {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .base-field--label-left .base-field__label,
+  .base-field--label-right .base-field__label {
+    width: 100% !important;
+    margin-bottom: 4px;
+    text-align: left !important;
+  }
 }
 
 
